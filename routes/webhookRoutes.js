@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-router.get('/', function (req, res, next) {
+router.post('/', function (req, res, next) {
   console.log('Dialogflow Request body: ' + JSON.stringify(req.body));
   switch (req.body.inputs.intent) {
     case "actions.intent.MAIN":
