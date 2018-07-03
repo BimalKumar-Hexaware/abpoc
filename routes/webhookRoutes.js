@@ -3,8 +3,8 @@ var router = express.Router();
 
 router.post('/', function (req, res, next) {
   console.log('Dialogflow Request body: ' + JSON.stringify(req.body));
-  switch (req.body.inputs.intent) {
-    case "actions.intent.MAIN":
+  switch (req.body.queryResult.action) {
+    case "input.welcome":
       res.json({
         "textToSpeech": "Hi welcome to micro strategy. I am Emily, your virtual assistant. Please choose how can I help you",
         "ssml": "Hi welcome to micro strategy. I am Emily, your virtual assistant. Please choose how can I help you",
