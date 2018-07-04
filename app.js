@@ -33,7 +33,7 @@ dialogflowApp.intent('Default Welcome Intent', conv => {
 dialogflowApp.intent('actions.intent.OPTION', (conv, params, option) => {
   let response = 'You did not select any item';
   if (option) {
-    response = dialogflowApp.getSelectedOption();
+    response = option;
   }
   console.log('actions.intent.OPTION - response', response);
   conv.ask(response);
