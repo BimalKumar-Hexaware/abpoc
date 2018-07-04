@@ -34,8 +34,7 @@ dialogflowApp.intent('ab.getCalanderEventsQuery', (conv, params) => {
   conv.ask('Are you looking for a particular meeting? please provide the date and time');
 });
 
-dialogflowApp.intent('ab.getCalanderEventsQuery-getDateAndTime', (conv, params) => {
-  console.log("params", params);
+dialogflowApp.intent('ab.getCalanderEventsQuery-getDateAndTime', (conv) => {
   conv.ask('You have a meeting with Alliance Bernstein at 9:30 over webex, a meeting with MR.John Doe at 11:00 in his office in New York office room 342');
 });
 
