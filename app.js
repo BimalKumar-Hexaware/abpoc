@@ -1,6 +1,6 @@
 const express = require('express')
 const bodyParser = require('body-parser')
-const { dialogflow,List } = require('actions-on-google')
+const { dialogflow, List } = require('actions-on-google')
 const port = process.env.PORT || 3000;
 
 var app = express();
@@ -14,9 +14,9 @@ dialogflowApp.intent('Default Welcome Intent', conv => {
     items: {
       ['SELECTION_KEY_GET_CALENDAR']: {
         synonyms: [
-          'Get calendar details',
+          'Get calendar events',
         ],
-        title: 'Get calendar details',
+        title: 'Get calendar events',
         description: 'Lets you retrieve calendar events',
       },
       ['SELECTION_KEY_MODIFY_CALENDAR']: {
@@ -28,6 +28,15 @@ dialogflowApp.intent('Default Welcome Intent', conv => {
       },
     },
   }));
+});
+
+dialogflowApp.intent('ab.getCalanderEventsQuery', (conv, params) => {
+  conv.ask('Are you looking for a particular meeting? please provide the date and time');
+});
+
+dialogflowApp.intent('ab.getCalanderEventsQuery-getDateAndTime', (conv, params) => {
+  console.log("params", params);
+  conv.ask('You have a meeting with Alliance Bernstein at 9:30 over webex, a meeting with MR.John Doe at 11:00 in his office in New York office room 342');
 });
 
 app.use(bodyParser.json(), dialogflowApp).listen(port, function () {
