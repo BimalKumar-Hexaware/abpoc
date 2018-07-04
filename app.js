@@ -30,6 +30,14 @@ dialogflowApp.intent('Default Welcome Intent', conv => {
   }));
 });
 
+dialogflowApp.intent('actions.intent.OPTION', (conv, params, option) => {
+  let response = 'You did not select any item';
+  if (option) {
+    response = dialogflowApp.getSelectedOption();
+  }
+  conv.ask(response);
+});
+
 dialogflowApp.intent('ab.getCalanderEventsQuery', (conv, params) => {
   conv.ask('Are you looking for a particular meeting? please provide the date and time');
 });
