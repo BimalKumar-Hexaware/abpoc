@@ -12,14 +12,14 @@ dialogflowApp.intent('Default Welcome Intent', conv => {
   conv.ask(new List({
     title: 'Please choose',
     items: {
-      [SELECTION_KEY_GET_CALENDAR]: {
+      ['SELECTION_KEY_GET_CALENDAR']: {
         synonyms: [
           'Get calendar details',
         ],
         title: 'Get calendar details',
         description: 'Lets you retrieve calendar events',
       },
-      [SELECTION_KEY_MODIFY_CALENDAR]: {
+      ['SELECTION_KEY_MODIFY_CALENDAR']: {
         synonyms: [
           'Modify calendar events',
         ],
