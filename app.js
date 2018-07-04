@@ -35,6 +35,7 @@ dialogflowApp.intent('actions.intent.OPTION', (conv, params, option) => {
   if (option) {
     response = dialogflowApp.getSelectedOption();
   }
+  console.log('actions.intent.OPTION - response', response);
   conv.ask(response);
 });
 
