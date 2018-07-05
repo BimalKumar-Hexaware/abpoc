@@ -40,7 +40,14 @@ app.intent('ab.getCalanderEventsQuery', (conv, params) => {
 });
 
 app.intent('ab.getCalanderEventsQuery-getInfo', (conv) => {
-    console.log(conv.body.queryResult.action);
+    var parameters = conv.parameters;
+    console.log("parameters", parameters);
+    var date_period = parameters.date_period;
+    var date_time = parameters.date_time;
+    var date = parameters.date;
+    var time = parameters.time;
+    var time_period = parameters.time_period;
+    console.log("date_period", date_period);
     conv.ask('You have a meeting with Alliance Bernstein at 9:30 over webex, a meeting with MR.John Doe at 11:00 in his office in New York office room 342');
 });
 
