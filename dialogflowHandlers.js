@@ -24,7 +24,15 @@ app.intent('Default Welcome Intent', conv => {
 });
 
 app.intent('Default Fallback Intent', (conv) => {
-    console.log("DEBUG",conv.arguments.raw.input.OPTION);
+    console.log("Selected option key", conv.arguments.raw.input.OPTION.textValue);
+    switch (conv.arguments.raw.input.OPTION.textValue) {
+        case 'SELECTION_KEY_GET_CALENDAR_EVENTS':
+            conv.followup('getcalendardetails-event');
+            break;
+        case 'SELECTION_KEY_MODIFY_EVENTS':
+
+            break;
+    }
 });
 
 app.intent('ab.getCalanderEventsQuery', (conv, params) => {
