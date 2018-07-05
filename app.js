@@ -30,18 +30,10 @@ dialogflowApp.intent('Default Welcome Intent', conv => {
   }));
 });
 
-dialogflowApp.intent('Default Fallback Intent', conv => {
+dialogflowApp.intent('Default Fallback Intent', (conv) => {
   console.log(conv.body.queryResult.action);
 });
 
-dialogflowApp.intent('actions.intent.OPTION', (conv, params, option) => {
-  let response = 'You did not select any item';
-  if (option) {
-    response = option;
-  }
-  console.log('actions.intent.OPTION - response', response);
-  conv.ask(response);
-});
 
 dialogflowApp.intent('ab.getCalanderEventsQuery', (conv, params) => {
   conv.ask('Are you looking for a particular meeting? please provide the date and time');
