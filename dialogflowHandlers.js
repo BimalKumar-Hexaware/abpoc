@@ -24,7 +24,7 @@ app.intent('Default Welcome Intent', conv => {
 });
 
 app.intent('Default Fallback Intent', (conv) => {
-    console.log("req",conv.Request);
+    console.log("req",conv.arguments);
 });
 
 app.intent('ab.getCalanderEventsQuery', (conv, params) => {
