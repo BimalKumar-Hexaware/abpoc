@@ -1,5 +1,5 @@
 const { dialogflow, List } = require('actions-on-google')
-const app = dialogflow({ debug: true });
+const app = dialogflow();
 app.intent('Default Welcome Intent', conv => {
     conv.ask('Hi welcome to micro strategy. I am Emily, your virtual assistant. Please tell me how can I help you');
     conv.ask(new List({
