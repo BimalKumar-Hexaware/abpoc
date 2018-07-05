@@ -39,7 +39,7 @@ app.intent('ab.getCalanderEventsQuery', (conv, params) => {
     conv.ask('I have your calendar details. Please provide the date and time');
 });
 
-app.intent('ab.getCalanderDateAndTime', (conv) => {
+app.intent('ab.getCalanderEventsQuery-getInfo', (conv) => {
     console.log(conv.body.queryResult.action);
     conv.ask('You have a meeting with Alliance Bernstein at 9:30 over webex, a meeting with MR.John Doe at 11:00 in his office in New York office room 342');
 });
