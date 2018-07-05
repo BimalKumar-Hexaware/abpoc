@@ -23,8 +23,8 @@ app.intent('Default Welcome Intent', conv => {
     }));
 });
 
-app.intent('actions.intent.OPTION',(conv)=>{
-    console.log("options fired");
+app.intent('Default Fallback Intent',(conv)=>{
+    console.log("*****************************************Fallback fired*****************************************");
 });
 
 app.intent('ab.getCalanderEventsQuery', (conv, params) => {
