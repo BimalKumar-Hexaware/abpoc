@@ -30,6 +30,10 @@ dialogflowApp.intent('Default Welcome Intent', conv => {
   }));
 });
 
+dialogflowApp.intent('Default Fallback Intent', conv => {
+  console.log(conv.body.queryResult.action);
+});
+
 dialogflowApp.intent('actions.intent.OPTION', (conv, params, option) => {
   let response = 'You did not select any item';
   if (option) {
@@ -44,7 +48,7 @@ dialogflowApp.intent('ab.getCalanderEventsQuery', (conv, params) => {
 });
 
 dialogflowApp.intent('ab.getCalanderEventsQuery-getDateAndTime', (conv) => {
-  console.log(conv.body.queryResult);
+  console.log(conv.body.queryResult.action);
   conv.ask('You have a meeting with Alliance Bernstein at 9:30 over webex, a meeting with MR.John Doe at 11:00 in his office in New York office room 342');
 });
 
