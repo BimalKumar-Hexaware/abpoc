@@ -9,7 +9,6 @@ const { WebhookClient, Text, Card, Payload, Suggestion } = require('dialogflow-f
 
 
 router.post('/api/webhook', function (req, res) {
-	var responseObj = JSON.parse(JSON.stringify(config.responseObj));
 	console.log("request", JSON.stringify(req.body));
 	var actionName = req.body.queryResult.action;
 	console.log(actionName);
