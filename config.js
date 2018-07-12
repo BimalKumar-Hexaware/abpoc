@@ -1,5 +1,6 @@
 module.exports = {
-	someKey: ""
+	'someKey': "",
+	'intents':['Default Welcome Intent']
 }
 
 
