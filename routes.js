@@ -1,17 +1,13 @@
 var express = require('express');
 var router = express.Router();
-var request = require('request');
 var config = require('./config.js');
-var path = require("path");
-var url = require('url');
-const { google } = require('googleapis');
 const { WebhookClient, Text, Card, Payload, Suggestion } = require('dialogflow-fulfillment');
-
 
 router.post('/api/webhook', function (req, res) {
 	console.log("request", JSON.stringify(req.body));
-	var actionName = req.body.queryResult.action;
-	console.log(actionName);
+	var reqBody = JSON.parse(req.body);
+	var actionName = reqBody.queryResult.action;
+	console.log("action", actionName);
 	const agent = new WebhookClient({ request: req, response: res });
 	let intentMap = new Map();
 	var intentsLen = config.intents.length;
