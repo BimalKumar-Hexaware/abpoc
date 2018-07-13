@@ -17,6 +17,7 @@ router.post('/api/webhook', function (req, res) {
 			agent.add(new Text('Hi welcome to micro strategy. I am Emily, your virtual assistant. How can I help you'));
 		});
 	}*/
+	const agent = new WebhookClient({ request: req, response: res });
 	var intent = req.body.inputs.intent;
 	console.log("intent", intent);
 	if(intent == "actions.intent.MAIN") {
