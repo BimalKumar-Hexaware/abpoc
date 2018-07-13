@@ -25,7 +25,7 @@ router.post('/api/webhook', function (req, res) {
 	}
 	const agent = new WebhookClient({ request: req, response: res });*/
 
-	var rawQuery = req.body.inputs[0].rawInputs.query;
+	var rawQuery = req.body.inputs[0].rawInputs[0].query;
 	console.log("rawQuery", rawQuery);
 	let jwtClient = new google.auth.JWT(
 		key.client_email, null, key.private_key,
@@ -33,7 +33,7 @@ router.post('/api/webhook', function (req, res) {
 		null
 	);
 	jwtClient.authorize((err, tokens) => {
-		request.post(config.dialogFlowAPI.replace('sessions', 123456789), {
+		request.post(config.dialogFlowAPI.replace('sessions', '123456789'), {
 			'auth': {
 				'bearer': tokens.access_token,
 			},
