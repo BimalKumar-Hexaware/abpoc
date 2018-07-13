@@ -21,6 +21,19 @@ router.post('/api/webhook', function (req, res) {
 
 });
 
+router.get('/test', function (req, res) {
+
+	var rawQuery = 'hi';
+	console.log("rawQuery", rawQuery);
+	return helper.queryDialogflow(rawQuery).then((result) => {
+		console.log('dfrersult', JSON.stringify(result));
+		console.log("please find the console output");
+	}).catch((err) => {
+		res.send(err);
+	})
+
+});
+
 module.exports = router;
 
 
