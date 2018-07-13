@@ -1,4 +1,5 @@
 var config = require('./config.js');
+var request = require('request');
 
 module.exports = {
     "queryDialogflow": function (rawQuery) {

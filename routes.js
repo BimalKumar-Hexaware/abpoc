@@ -6,7 +6,7 @@ const { dialogflow, List } = require('actions-on-google');
 const key = require('./abmspoc-e6fa7-cf116347d6d7.json');
 const { google } = require('googleapis');
 var jwksClient = require('jwks-rsa');
-var request = require('request');
+
 
 router.post('/api/webhook', function (req, res) {
 	console.log("request", JSON.stringify(req.body));
@@ -14,7 +14,7 @@ router.post('/api/webhook', function (req, res) {
 	var rawQuery = req.body.inputs[0].rawInputs[0].query;
 	console.log("rawQuery", rawQuery);
 	return helper.queryDialogflow(rawQuery).then((result) => {
-		console.log('dfrersult', result);
+		console.log('dfrersult', JSON.stringify(result));
 	}).catch((err) => {
 		res.send(err);
 	})
