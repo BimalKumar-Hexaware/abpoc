@@ -33,7 +33,7 @@ router.post('/api/webhook', function (req, res) {
 		null
 	);
 	jwtClient.authorize((err, tokens) => {
-		request.post(config.dialogFlowAPI, {
+		request.post(config.dialogFlowAPI.replace('sessions', '123456789'), {
 			'auth': {
 				'bearer': tokens.access_token,
 			},
