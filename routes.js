@@ -5,29 +5,25 @@ const { WebhookClient, Text, Card, Payload, Suggestion } = require('dialogflow-f
 
 router.post('/api/webhook', function (req, res) {
 	console.log("request", JSON.stringify(req.body));
-	var actionName = req.body.queryResult.action;
+	/*var actionName = req.body.queryResult.action;
 	console.log("action", actionName);
 	const agent = new WebhookClient({ request: req, response: res });
 	let intentMap = new Map();
 	var intentsLen = config.intents.length;
 	for (i = 0; i < intentsLen; i++) {
-		intentMap.set(config.intents[i], userCheck);
+		intentMap.set(config.intents[i], function (agent) {
+			agent.add(new Suggestion('People Soft'));
+			agent.add(new Suggestion('Work Day'));
+			agent.add(new Text('Hi welcome to micro strategy. I am Emily, your virtual assistant. How can I help you'));
+		});
+	}*/
+	var intent = req.body.inputs.intent;
+	console.log("intent", intent);
+	if(intent == "actions.intent.MAIN") {
+		agent.add(new Text('Hi welcome to micro strategy. I am Emily, your virtual assistant. How can I help you'));
 	}
 	agent.handleRequest(intentMap);
 });
-
-var userCheck = function (agent) {
-	console.log(JSON.stringify(agent.request_.body));
-	agent.add(new Card({
-		title: 'Login ',
-		text: 'Please click login to get access me',
-		buttonText: 'Login',
-		buttonUrl: 'http://localhost:3000/login.html?userId=' + agent.request_.body.originalDetectIntentRequest.payload.user.userId
-	}));
-	agent.add(new Suggestion('People Soft'));
-	agent.add(new Suggestion('Work Day'));
-}
-
 
 module.exports = router;
 
