@@ -6,6 +6,7 @@ module.exports = {
         console.log('inside queryDialogflow');
         return new Promise(function (resolve, reject) {
             var options = {
+                proxy: 'http://gmdvproxy.acml.com:8080/',
                 method: 'POST',
                 url: config.dialogflowV1API,
                 headers:

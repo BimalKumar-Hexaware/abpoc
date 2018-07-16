@@ -28,6 +28,7 @@ router.get('/test', function (req, res) {
 	return helper.queryDialogflow(rawQuery).then((result) => {
 		console.log('dfrersult', JSON.stringify(result));
 		console.log("please find the console output");
+		res.json(result);
 	}).catch((err) => {
 		res.send(err);
 	})
