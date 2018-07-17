@@ -35,6 +35,7 @@ module.exports = {
         });
     },
     "getSalesInfo": function () {
+	return new Promise(function (resolve, reject) {
         async.waterfall([
             function (cb) {
                 var options = {
@@ -69,7 +70,9 @@ module.exports = {
                 console.log("First Response in second req", authToken);
                 var options = {
                     method: 'POST',
-                    url: 'http://10.82.185.43:10086/json-data-api/reports/30482C1945D0C6D0AC3D2AB55F293A05/instances',
+                    url: 'http://10.82.185.43:10086/json-data-
+
+api/reports/30482C1945D0C6D0AC3D2AB55F293A05/instances',
                     qs: { offset: '0', limit: '1000' },
                     headers:
                     {
@@ -96,7 +99,9 @@ module.exports = {
                 console.log("Second Response", instanceId);
                 var options = {
                     method: 'GET',
-                    url: 'http://10.82.185.43:10086/json-data-api/reports/30482C1945D0C6D0AC3D2AB55F293A05/instances/' + instanceId,
+                    url: 'http://10.82.185.43:10086/json-data-
+
+api/reports/30482C1945D0C6D0AC3D2AB55F293A05/instances/' + instanceId,
                     qs: { offset: '0', limit: '1000' },
                     headers:
                     {
@@ -109,24 +114,30 @@ module.exports = {
                 request(options, function (error, response, body) {
                     if (error) throw new Error(error);
 
-                    console.log("THIRD API BODY", body);
+                    console.log("THIRD API BODY", JSON.parse(body).result);
+body = JSON.parse(body);
                     var conversation = "Here are the details " +
                         "Firm " + body.result.data.root.children[0].element.name + " " +
-                        "Region " + body.result.data.root.children[0].children[0].element.name + " " +
-                        "Regional Manager " + body.result.data.root.children[0].children[0].element.name + " " +
+                        "Region " + body.result.data.root.children[0].children[0].element.name + " " 
+
++
+                        "Regional Manager " + body.result.data.root.children[0].children
+
+[0].element.name + " " +
                         "Count of Branch " + body.result.definition.metrics[0].max + " " +
                         "Branch Rank " + body.result.definition.metrics[1].max + " " +
                         "MF & SMA Pr. Year Sales " + body.result.definition.metrics[2].max + " "+
                         "Total RM YTD Sales " + body.result.definition.metrics[4].max + " ";
-                    cb(conversation);
+                    resolve(conversation);
                 });
 
             }
         ], function (error) {
             if (error) {
                 console.log("ERROR: ", error);
-                cb("Something went wrong!");
+                reject("Something went wrong!");
             }
         });
+});
     }
 };
