@@ -52,7 +52,7 @@ app.intent('Default Fallback Intent', (conv) => {
     console.log("Selected option key", conv.arguments.raw.input.OPTION.textValue);
     switch (conv.arguments.raw.input.OPTION.textValue) {
         case 'SELECTION_KEY_GET_CALENDAR_EVENTS':
-            return helper.queryDialogflow(rawQuery).then((result) => {
+            return helper.queryDialogflow("get calendar events").then((result) => {
                 console.log('dfrersult', JSON.stringify(result));
                 conv.ask(result.fulfillment.messages[0].textToSpeech);
             }).catch((err) => {
@@ -60,7 +60,12 @@ app.intent('Default Fallback Intent', (conv) => {
             })
             break;
         case 'SELECTION_KEY_MODIFY_EVENTS':
-            conv.intent('ab.modifyCalendarEventSelected');
+            return helper.queryDialogflow("get calendar events").then((result) => {
+                console.log('dfrersult', JSON.stringify(result));
+                conv.ask(result.fulfillment.messages[0].textToSpeech);
+            }).catch((err) => {
+                res.send(err);
+            })
             break;
     }
 });
@@ -69,10 +74,20 @@ app.intent('actions.intent.OPTION', (conv, params, option) => {
     console.log(option);
     switch (option) {
         case 'SELECTION_KEY_GET_CALENDAR_EVENTS':
-
+            return helper.queryDialogflow("get calendar events").then((result) => {
+                console.log('dfrersult', JSON.stringify(result));
+                conv.ask(result.fulfillment.messages[0].textToSpeech);
+            }).catch((err) => {
+                res.send(err);
+            })
             break;
         case 'SELECTION_KEY_MODIFY_EVENTS':
-            break;
+            return helper.queryDialogflow("get calendar events").then((result) => {
+                console.log('dfrersult', JSON.stringify(result));
+                conv.ask(result.fulfillment.messages[0].textToSpeech);
+            }).catch((err) => {
+                res.send(err);
+            })
     }
     conv.ask('You did not select any item');
 });
