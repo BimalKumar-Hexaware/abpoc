@@ -1,5 +1,7 @@
 const { dialogflow, List, actionssdk } = require('actions-on-google')
 const app = actionssdk();
+var helper = require('./helper');
+
 app.intent('actions.intent.MAIN', conv => {
     conv.ask('Hi welcome to micro strategy. I am Emily, your virtual assistant. Please tell me how can I help you');
     conv.ask(new List({
@@ -50,8 +52,12 @@ app.intent('Default Fallback Intent', (conv) => {
     console.log("Selected option key", conv.arguments.raw.input.OPTION.textValue);
     switch (conv.arguments.raw.input.OPTION.textValue) {
         case 'SELECTION_KEY_GET_CALENDAR_EVENTS':
-            //conv.followup('getcalendardetails-event');
-            conv.intent('ab.getCalanderEventSelected');
+            return helper.queryDialogflow(rawQuery).then((result) => {
+                console.log('dfrersult', JSON.stringify(result));
+                conv.ask(result.fulfillment.messages[0].textToSpeech);
+            }).catch((err) => {
+                res.send(err);
+            })
             break;
         case 'SELECTION_KEY_MODIFY_EVENTS':
             conv.intent('ab.modifyCalendarEventSelected');
@@ -63,14 +69,17 @@ app.intent('actions.intent.OPTION', (conv, params, option) => {
     console.log(option);
     switch (option) {
         case 'SELECTION_KEY_GET_CALENDAR_EVENTS':
-            //conv.followup('getcalendardetails-event');
-            conv.intent('ab.getCalanderEventSelected');
+
             break;
         case 'SELECTION_KEY_MODIFY_EVENTS':
-            conv.intent('ab.modifyCalendarEventSelected');
             break;
     }
     conv.ask('You did not select any item');
+});
+
+
+app.intent('actions.intent.TEXT', (conv) => {
+    conv.ask('hmm. i need an api call');
 });
 
 app.intent('ab.getCalanderEventSelected', (conv, params) => {
