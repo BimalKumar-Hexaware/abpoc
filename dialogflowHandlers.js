@@ -14,10 +14,10 @@ app.intent('actions.intent.MAIN', conv => {
             },
             ['SELECTION_KEY_MODIFY_EVENTS']: {
                 synonyms: [
-                    'Modify calendar events',
+                    'Get sales information',
                 ],
-                title: 'Modify calendar events',
-                description: 'Lets you modify calendar events'
+                title: 'Get sales information',
+                description: 'Lets you get your sales'
             },
         },
     }));
@@ -50,10 +50,11 @@ app.intent('Default Fallback Intent', (conv) => {
     console.log("Selected option key", conv.arguments.raw.input.OPTION.textValue);
     switch (conv.arguments.raw.input.OPTION.textValue) {
         case 'SELECTION_KEY_GET_CALENDAR_EVENTS':
-            conv.followup('getcalendardetails-event');
+            //conv.followup('getcalendardetails-event');
+            conv.intent('ab.getCalanderEventSelected');
             break;
         case 'SELECTION_KEY_MODIFY_EVENTS':
-            conv.followup('modifycalendardetails-event');
+            conv.intent('ab.modifyCalendarEventSelected');
             break;
     }
 });
