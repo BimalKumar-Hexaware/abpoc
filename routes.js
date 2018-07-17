@@ -10,15 +10,19 @@ var jwksClient = require('jwks-rsa');
 
 router.post('/api/webhook', function (req, res) {
 	console.log("request", JSON.stringify(req.body));
+	const agent = new WebhookClient({ request: req, response: res });
 
-	var rawQuery = req.body.inputs[0].rawInputs[0].query;
+	/*var rawQuery = req.body.inputs[0].rawInputs[0].query;
 	console.log("rawQuery", rawQuery);
 	return helper.queryDialogflow(rawQuery).then((result) => {
 		console.log('dfrersult', JSON.stringify(result));
+		result.fulfillment.messages[0].textToSpeech;
 	}).catch((err) => {
 		res.send(err);
-	})
+	})*/
 
+	agent.add(new Suggestion('People Soft'));
+	agent.add(new Suggestion('Work Day'));
 });
 
 router.get('/test', function (req, res) {
