@@ -52,13 +52,21 @@ app.intent('actions.intent.TEXT', (conv) => {
     console.log(conv.input.raw);
     return helper.queryDialogflow(conv.input.raw).then((result) => {
         console.log('dfrersult', JSON.stringify(result));
-        conv.ask(result.fulfillment.messages[0].textToSpeech);
+        var response;
+        switch (result.action) {
+            case 'input.unknown':
+                response = result.fulfillment.messages[0].textToSpeech;
+                break;
+            case 'ab.salesInfoSelected-salesInfoQuery':
+            response = "";
+                break;
+        }
+        conv.ask(response);
+
     }).catch((err) => {
         res.send(err);
     });
 });
-
-module.exports = app;
 
 /*var rawQuery = req.body.inputs[0].rawInputs[0].query;
 console.log("rawQuery", rawQuery);
