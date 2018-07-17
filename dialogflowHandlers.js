@@ -59,6 +59,15 @@ app.intent('Default Fallback Intent', (conv) => {
     }
 });
 
+app.intent('actions.intent.OPTION', (conv, params, option) => {
+    console.log(option);
+    let response = 'You did not select any item';
+    if (option && SELECTED_ITEM_RESPONSES.hasOwnProperty(option)) {
+        response = SELECTED_ITEM_RESPONSES[option];
+    }
+    conv.ask(option);
+});
+
 app.intent('ab.getCalanderEventSelected', (conv, params) => {
     conv.ask('Sure. Please provide the date and time');
 });
