@@ -32,19 +32,21 @@ app.get('/', (req, res) => {
                     if (error) throw new Error(error);
                 };
 
-                console.log("FIRST API BODY", body);
-                cb(JSON.parse(body));
+                console.log("FIRST API AUTH TOKEN", JSON.parse(body).authToken);
+                cb(null, JSON.parse(body).authToken);
             });
         },
-        function (firstResp, cb) {
-            console.log("First Response in second req", firstResp);
+        function (authToken, cb) {
+            console.log("First Response in second req", authToken);
             var options = {
                 method: 'POST',
-                url: 'http://10.82.185.43:10086/json-data-api/reports/30482C1945D0C6D0AC3D2AB55F293A05/instances',
+                url: 'http://10.82.185.43:10086/json-data-
+
+api/reports/30482C1945D0C6D0AC3D2AB55F293A05/instances',
                 qs: { offset: '0', limit: '1000' },
                 headers:
                 {
-                    'x-mstr-authtoken': firstResp.authToken,
+                    'x-mstr-authtoken': authToken,
                     'content-type': 'application/vnd.mstr.dataapi.v0+json',
                     'cache-control': 'no-cache',
                     accept: 'application/vnd.mstr.dataapi.v0+json'
@@ -58,20 +60,22 @@ app.get('/', (req, res) => {
                 };
 
                 console.log("SECOND API BODY", body);
-                cb(firstResp, JSON.parse(body));
+                cb(null,authToken, JSON.parse(body).instanceId);
             });
 
         },
-        function (firstResp, secondResp, cb) {
-            console.log("First Response in third req", firstResp);
-            console.log("Second Response", secondResp);
+        function (authToken, instanceId, cb) {
+            console.log("First Response in third req", authToken);
+            console.log("Second Response", instanceId);
             var options = {
                 method: 'GET',
-                url: 'http://10.82.185.43:10086/json-data-api/reports/30482C1945D0C6D0AC3D2AB55F293A05/instances/' + secondResp.instanceId,
+                url: 'http://10.82.185.43:10086/json-data-
+
+api/reports/30482C1945D0C6D0AC3D2AB55F293A05/instances/' + instanceId,
                 qs: { offset: '0', limit: '1000' },
                 headers:
                 {
-                    'x-mstr-authtoken': firstResp.authToken,
+                    'x-mstr-authtoken': authToken,
                     'cache-control': 'no-cache',
                     accept: 'application/vnd.mstr.dataapi.v0+json'
                 }
@@ -81,7 +85,7 @@ app.get('/', (req, res) => {
                 if (error) throw new Error(error);
 
                 console.log("THIRD API BODY", body);
-                res.json(body);
+                res.send(body);
             });
 
         }
@@ -93,4 +97,5 @@ app.get('/', (req, res) => {
     });
 });
 
-app.listen(port, () => console.log('Example app listening on port 3000!'))
+app.listen(port, () => console.log('Example app listening on port 8880!'))
+
