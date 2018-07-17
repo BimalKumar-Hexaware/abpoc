@@ -49,7 +49,7 @@ app.intent('actions.intent.OPTION', (conv, params, option) => {
 
 
 app.intent('actions.intent.TEXT', (conv) => {
-    console.log(conv);
+    console.log(conv.input);
     conv.ask('hmm. i need an api call');
 });
 
