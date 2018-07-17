@@ -61,7 +61,15 @@ app.intent('Default Fallback Intent', (conv) => {
 
 app.intent('actions.intent.OPTION', (conv, params, option) => {
     console.log(option);
-    
+    switch (option) {
+        case 'SELECTION_KEY_GET_CALENDAR_EVENTS':
+            //conv.followup('getcalendardetails-event');
+            conv.intent('ab.getCalanderEventSelected');
+            break;
+        case 'SELECTION_KEY_MODIFY_EVENTS':
+            conv.intent('ab.modifyCalendarEventSelected');
+            break;
+    }
     conv.ask('You did not select any item');
 });
 
