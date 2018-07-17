@@ -58,11 +58,13 @@ app.intent('actions.intent.TEXT', (conv) => {
                 response = result.fulfillment.messages[0].textToSpeech;
                 break;
             case 'ab.salesInfoSelected-salesInfoQuery':
-            response = "";
+                return helper.getSalesInfo().then((result) => {
+                    conv.ask(result);
+                }).catch((err) => {
+                    conv.ask(err);
+                });
                 break;
         }
-        conv.ask(response);
-
     }).catch((err) => {
         res.send(err);
     });
