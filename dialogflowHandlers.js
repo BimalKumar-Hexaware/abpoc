@@ -49,8 +49,13 @@ app.intent('actions.intent.OPTION', (conv, params, option) => {
 
 
 app.intent('actions.intent.TEXT', (conv) => {
-    console.log(conv.input);
-    conv.ask('hmm. i need an api call');
+    console.log(conv.input.raw);
+    return helper.queryDialogflow(conv.input.raw).then((result) => {
+        console.log('dfrersult', JSON.stringify(result));
+        conv.ask(result.fulfillment.messages[0].textToSpeech);
+    }).catch((err) => {
+        res.send(err);
+    });
 });
 
 module.exports = app;
