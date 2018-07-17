@@ -14,12 +14,12 @@ app.intent('actions.intent.MAIN', conv => {
                 title: 'Get calendar events',
                 description: 'Lets you retrieve calendar events',
             },
-            ['SELECTION_KEY_MODIFY_EVENTS']: {
+            ['SELECTION_KEY_GET_SALES_INFO']: {
                 synonyms: [
                     'Get sales information',
                 ],
                 title: 'Get sales information',
-                description: 'Lets you get your sales'
+                description: 'Lets you get your sales related information'
             },
         },
     }));
@@ -36,42 +36,20 @@ app.intent('actions.intent.OPTION', (conv, params, option) => {
                 res.send(err);
             })
             break;
-        case 'SELECTION_KEY_MODIFY_EVENTS':
-            return helper.queryDialogflow("get calendar events").then((result) => {
+        case 'SELECTION_KEY_GET_SALES_INFO':
+            return helper.queryDialogflow("get sales info").then((result) => {
                 console.log('dfrersult', JSON.stringify(result));
                 conv.ask(result.fulfillment.messages[0].textToSpeech);
             }).catch((err) => {
                 res.send(err);
             })
             break;
-    }    
+    }
 });
 
 
 app.intent('actions.intent.TEXT', (conv) => {
     conv.ask('hmm. i need an api call');
-});
-
-app.intent('ab.getCalanderEventSelected', (conv, params) => {
-    conv.ask('Sure. Please provide the date and time');
-});
-
-app.intent('ab.modifyCalendarEventSelected', (conv, params) => {
-    conv.ask('I can do it for you. Please provide the date, scheduled time and the new time of the meeting');
-});
-
-app.intent('ab.getCalanderEventsQuery-getInfo', (conv) => {
-    var parameters = conv.parameters;
-    console.log("parameters", parameters);
-    var date_time = parameters.date_time;
-    conv.ask('You have a meeting with Alliance Bernstein at 9:30 over webex, a meeting with MR.John Doe at 11:00 in his office in New York office room 342');
-});
-
-app.intent('ab.modifyCalendarEventSelected-getInfo', (conv) => {
-    var parameters = conv.parameters;
-    console.log("parameters", parameters);
-    var messages = ["You have an conflict with your calendar  timing at 2:00", "Your meeting has been moved to the requested time"];
-    conv.ask(messages[Math.floor(Math.random() * messages.length)]);
 });
 
 module.exports = app;
