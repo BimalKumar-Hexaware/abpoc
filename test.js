@@ -40,9 +40,7 @@ app.get('/', (req, res) => {
             console.log("First Response in second req", authToken);
             var options = {
                 method: 'POST',
-                url: 'http://10.82.185.43:10086/json-data-
-
-api/reports/30482C1945D0C6D0AC3D2AB55F293A05/instances',
+                url: 'http://10.82.185.43:10086/json-data-api/reports/30482C1945D0C6D0AC3D2AB55F293A05/instances',
                 qs: { offset: '0', limit: '1000' },
                 headers:
                 {
@@ -69,9 +67,7 @@ api/reports/30482C1945D0C6D0AC3D2AB55F293A05/instances',
             console.log("Second Response", instanceId);
             var options = {
                 method: 'GET',
-                url: 'http://10.82.185.43:10086/json-data-
-
-api/reports/30482C1945D0C6D0AC3D2AB55F293A05/instances/' + instanceId,
+                url: 'http://10.82.185.43:10086/json-data-api/reports/30482C1945D0C6D0AC3D2AB55F293A05/instances/' + instanceId,
                 qs: { offset: '0', limit: '1000' },
                 headers:
                 {

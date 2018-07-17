@@ -34,7 +34,7 @@ app.intent('actions.intent.OPTION', (conv, params, option) => {
                 conv.ask(result.fulfillment.messages[0].textToSpeech);
             }).catch((err) => {
                 res.send(err);
-            })
+            });
             break;
         case 'SELECTION_KEY_GET_SALES_INFO':
             return helper.queryDialogflow("get sales info").then((result) => {
@@ -42,13 +42,14 @@ app.intent('actions.intent.OPTION', (conv, params, option) => {
                 conv.ask(result.fulfillment.messages[0].textToSpeech);
             }).catch((err) => {
                 res.send(err);
-            })
+            });
             break;
     }
 });
 
 
 app.intent('actions.intent.TEXT', (conv) => {
+    console.log(conv);
     conv.ask('hmm. i need an api call');
 });
 
