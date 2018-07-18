@@ -115,7 +115,7 @@ module.exports = {
                         var conversation = "Here are the details " +
                             "Firm " + body.result.data.root.children[0].element.name + " " +
                             "Region " + body.result.data.root.children[0].children[0].element.name + " " +
-                            "Regional Manager " + body.result.data.root.children[0].children[0].element.name + " " +
+                            "Regional Manager " + body.result.data.root.children[0].children[0].children[0].element.name + " " +
                             "Count of Branch " + body.result.definition.metrics[0].max + " " +
                             "Branch Rank " + body.result.definition.metrics[1].max + " " +
                             "MF & SMA Pr. Year Sales " + body.result.definition.metrics[2].max + " " +
