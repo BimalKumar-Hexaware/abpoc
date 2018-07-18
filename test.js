@@ -1,15 +1,19 @@
 const express = require('express')
 const app = express();
-var request = require("request");
-var async = require('async');
 var helper = require('./helper');
 
 const port = process.env.PORT || 8880;
 
-app.get('/', (req, res) => {
-    return helper.getSalesInfo().then((result) => {
-        res.send(result);
+app.post('/simulation', (req, res) => {
+    return helper.queryDialogflow("get sales info").then((result) => {
+        console.log('Dialogflow', JSON.stringify(result));
+        return helper.getSalesInfo().then((result) => {
+            res.send(result);
+        }).catch((err) => {
+            res.send(err);
+        });
     }).catch((err) => {
+        console.log("some error occured");
         res.send(err);
     });
 });
