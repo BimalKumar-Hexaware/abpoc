@@ -1,0 +1,40 @@
+{
+  "actions": [
+    {
+      "description": "Default Welcome Intent",
+      "name": "MAIN",
+      "fulfillment": {
+        "conversationName": "test"
+      },
+      "intent": {
+        "name": "actions.intent.MAIN",
+        "trigger": {
+          "queryPatterns": [
+            "talk to microstrategy"
+          ]
+        }
+      }
+    },
+	{
+      "name": "CALENDAR_EVENT_SELECTION",
+	  "fulfillment": {
+        "conversationName": "test"
+      },
+      "intent": {
+        "name": "ab.getCalanderEventSelected",
+        "trigger": {
+          "queryPatterns": [
+            "get calendar events"
+          ]
+        }
+      }
+    }
+  ],
+  "conversations": {
+    "test": {
+      "name": "test",
+      "url": "https://node-proxy-ab.herokuapp.com/api"
+    }
+  },
+  "locale": "en"
+}

@@ -33,7 +33,7 @@ app.intent('actions.intent.OPTION', (conv, params, option) => {
                 console.log('dfrersult', JSON.stringify(result));
                 conv.ask(result.fulfillment.messages[0].textToSpeech);
             }).catch((err) => {
-                res.send(err);
+                conv.ask(err);
             });
             break;
         case 'SELECTION_KEY_GET_SALES_INFO':
@@ -41,7 +41,7 @@ app.intent('actions.intent.OPTION', (conv, params, option) => {
                 console.log('dfrersult', JSON.stringify(result));
                 conv.ask(result.fulfillment.messages[0].textToSpeech);
             }).catch((err) => {
-                res.send(err);
+                conv.ask(err);
             });
             break;
     }
