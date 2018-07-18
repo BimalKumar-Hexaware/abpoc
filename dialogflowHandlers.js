@@ -70,6 +70,8 @@ app.intent('actions.intent.TEXT', (conv) => {
     });
 });
 
+module.exports = app;
+
 /*var rawQuery = req.body.inputs[0].rawInputs[0].query;
 console.log("rawQuery", rawQuery);
 let jwtClient = new google.auth.JWT(
