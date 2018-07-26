@@ -34,7 +34,9 @@ module.exports = {
             });
         });
     },
-    "getSalesInfo": function () {
+    "getSalesInfo": function (rprtId) {
+        //EE5687854B3A8B7C9144AA9C0BB2FD75
+        reportId = rprtId || "30482C1945D0C6D0AC3D2AB55F293A05";
         return new Promise(function (resolve, reject) {
             async.waterfall([
                 function (cb) {
@@ -70,7 +72,7 @@ module.exports = {
                     console.log("First Response in second req", authToken);
                     var options = {
                         method: 'POST',
-                        url: 'http://10.82.185.43:10086/json-data-api/reports/30482C1945D0C6D0AC3D2AB55F293A05/instances',
+                        url: 'http://10.82.185.43:10086/json-data-api/reports/' + reportId + '/instances',
                         qs: { offset: '0', limit: '1000' },
                         headers:
                         {
@@ -97,7 +99,7 @@ module.exports = {
                     console.log("Second Response", instanceId);
                     var options = {
                         method: 'GET',
-                        url: 'http://10.82.185.43:10086/json-data-api/reports/30482C1945D0C6D0AC3D2AB55F293A05/instances/' + instanceId,
+                        url: 'http://10.82.185.43:10086/json-data-api/reports/' + reportId + '/instances/' + instanceId,
                         qs: { offset: '0', limit: '1000' },
                         headers:
                         {
