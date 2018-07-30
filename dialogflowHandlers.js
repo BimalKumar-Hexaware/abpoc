@@ -1,5 +1,5 @@
 const { dialogflow, List, actionssdk } = require('actions-on-google')
-const app = actionssdk();
+const app = actionssdk({ debug: true });
 var helper = require('./helper');
 
 app.intent('actions.intent.MAIN', conv => {

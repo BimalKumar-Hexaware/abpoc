@@ -1,6 +1,8 @@
 var config = require('./config.js');
 var request = require('request');
 var async = require('async');
+var botConfig = require('./abmspoc-e6fa7-cf116347d6d7.json');
+var requestWithJWT = require('google-oauth-jwt').requestWithJWT();
 
 module.exports = {
     "queryDialogflow": function (rawQuery) {
@@ -131,6 +133,23 @@ module.exports = {
                     console.log("ERROR: ", error);
                     reject("Something went wrong!");
                 }
+            });
+        });
+    },
+    "generateAccessToken": function () {
+        return new Promise((resolve, reject) => {
+            requestWithJWT({
+                url: 'https://www.googleapis.com/drive/v2/files',
+                jwt: {
+                    email: botConfig.client_email,
+                    key: botConfig.private_key,
+                    scopes: ['https://www.googleapis.com/auth/cloud-platform']
+                }
+            }, function (err, res, body) {
+                if (err) {
+                    reject(err);
+                }
+                resolve(body);
             });
         });
     }
