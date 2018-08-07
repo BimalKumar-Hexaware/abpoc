@@ -1,7 +1,7 @@
 var config = require('./config.js');
 var request = require('request');
 var async = require('async');
-var botConfig = require('./abmspoc-e6fa7-cf116347d6d7.json');
+var botConfig = require('./abmspoc-e6fa7-9b84f81aec59.json');
 var requestWithJWT = require('google-oauth-jwt').requestWithJWT();
 
 module.exports = {
