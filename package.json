@@ -26,6 +26,7 @@
     "google-oauth-jwt": "^0.2.0",
     "googleapis": "^32.0.0",
     "http": "0.0.0",
+    "lodash": "^4.17.10",
     "request": "^2.87.0"
   }
 }

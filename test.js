@@ -4,14 +4,10 @@ var helper = require('./helper');
 
 const port = process.env.PORT || 8880;
 
-app.post('/simulation', (req, res) => {
-    return helper.queryDialogflow("get sales info").then((result) => {
-        console.log('Dialogflow', JSON.stringify(result));
-        return helper.getSalesInfo().then((result) => {
-            res.send(result);
-        }).catch((err) => {
-            res.send(err);
-        });
+app.get('/test', (req, res) => {
+    return helper.salesByRegionReport().then((result) => {
+        //console.log('result', JSON.parse(result).header);
+        res.json(result);
     }).catch((err) => {
         console.log("some error occured");
         res.send(err);
