@@ -203,7 +203,7 @@ var self = {
             eventEnd = '<s>End date is <say-as interpret-as="date" format="mdy" detail="2">' + eventEndArray[0] + '</say-as><say-as interpret-as="time" format="hm12">' + eventEndArray[1] + ' ' + eventEndArray[2] + '</say-as></s>';
             eventType = 'Event Type is ' + value.children[0].children[0].children[0].children[0].element.name;
             eventSubject = 'Event subject is ' + value.children[0].children[0].children[0].children[0].children[0].element.name;
-            eventLocation = 'and the event location is ' + value.children[0].children[0].children[0].children[0].children[0].children[0].element.name;
+            eventLocation = (value.children[0].children[0].children[0].children[0].children[0].children[0].element.name == "") ? 'Event location is not provided'  : 'and the event location is ' + value.children[0].children[0].children[0].children[0].children[0].children[0].element.name;
             //eventSubject = eventSubject.replace(/\\\//g, "/");;
             speechText += '<s>' + eventAssignedTo + '.</s><s>' + eventContactAttendees + '.</s>' + eventStart + eventEnd;
             speechText += '<s>' + eventType + '.</s><s>' + eventLocation + '</s>';

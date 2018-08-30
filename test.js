@@ -5,7 +5,7 @@ var helper = require('./helper');
 const port = process.env.PORT || 8880;
 
 app.get('/test', (req, res) => {
-    return helper.salesByRegionReport().then((result) => {
+    return helper.getEventReport().then((result) => {
         //console.log('result', JSON.parse(result).header);
         res.json(result);
     }).catch((err) => {
