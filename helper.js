@@ -44,7 +44,7 @@ var self = {
                 function (cb) {
                     var options = {
                         method: 'POST',
-                        url: 'http://172.25.142.36:8080/MicroStrategyLibrary/api/auth/login',
+                        url: 'http://172.25.142.36:8075/MicroStrategyLibrary/api/auth/login',
                         headers:
                         {
                             accept: 'text/html',
@@ -82,8 +82,8 @@ var self = {
                     console.log("passed tokrn", mstrAuthToken);
                     var options = {
                         method: 'POST',
-                        url: 'http://172.25.142.36:8080/MicroStrategyLibrary/api/reports/88719C9746FB893117148CACBA0CB92E/instances',
-                        qs: { limit: '100' },
+                        url: 'http://172.25.142.36:8075/MicroStrategyLibrary/api/reports/88719C9746FB893117148CACBA0CB92E/instances',
+                        qs: { limit: '3' },
                         headers:
                         {
                             'x-mstr-projectid': 'B19DEDCC11D4E0EFC000EB9495D0F44F',
@@ -120,7 +120,7 @@ var self = {
                 function (cb) {
                     var options = {
                         method: 'POST',
-                        url: 'http://172.25.142.36:8080/MicroStrategyLibrary/api/auth/login',
+                        url: 'http://172.25.142.36:8075/MicroStrategyLibrary/api/auth/login',
                         headers:
                         {
                             accept: 'text/html',
@@ -157,8 +157,8 @@ var self = {
                     console.log("passed tokrn", mstrAuthToken);
                     var options = {
                         method: 'POST',
-                        url: 'http://172.25.142.36:8080/MicroStrategyLibrary/api/reports/B85A18A944D682077AD280BD71DFE38E/instances',
-                        qs: { limit: '100' },
+                        url: 'http://172.25.142.36:8075/MicroStrategyLibrary/api/reports/B85A18A944D682077AD280BD71DFE38E/instances',
+                        qs: { limit: '3' },
                         headers:
                         {
                             'x-mstr-projectid': 'B19DEDCC11D4E0EFC000EB9495D0F44F',
