@@ -203,10 +203,13 @@ var self = {
             eventEnd = '<s>End date is <say-as interpret-as="date" format="mdy" detail="2">' + eventEndArray[0] + '</say-as><say-as interpret-as="time" format="hm12">' + eventEndArray[1] + ' ' + eventEndArray[2] + '</say-as></s>';
             eventType = 'Event Type is ' + value.children[0].children[0].children[0].children[0].element.name;
             eventSubject = 'Event subject is ' + value.children[0].children[0].children[0].children[0].children[0].element.name;
-            eventLocation = (value.children[0].children[0].children[0].children[0].children[0].children[0].element.name == "") ? 'Event location is not provided'  : 'and the event location is ' + value.children[0].children[0].children[0].children[0].children[0].children[0].element.name;
+            eventLocation = (value.children[0].children[0].children[0].children[0].children[0].children[0].element.name == "") ? 'Event location is not provided' : 'and the event location is ' + value.children[0].children[0].children[0].children[0].children[0].children[0].element.name;
             //eventSubject = eventSubject.replace(/\\\//g, "/");;
-            speechText += '<s>' + eventAssignedTo + '.</s><s>' + eventContactAttendees + '.</s>' + eventStart + eventEnd;
-            speechText += '<s>' + eventType + '.</s><s>' + eventLocation + '</s>';
+            speechText += '<s>' + eventAssignedTo + '.</s>';
+            speechText += '<s>' + eventContactAttendees + '.</s>';
+            speechText += eventStart + eventEnd;
+            speechText += '<s>' + eventType + '.</s>';
+            speechText += '<s>' + eventLocation + '.</s>  ';
             //<s>' + eventSubject + '</s>
             speechText += '<break time="1s"/>';
         });
@@ -220,7 +223,7 @@ var self = {
         category = data[0].children[0].element.name;
         speechText = '<speak>Here are the sales report details <break time="200ms"/>';
         _.forEach(data[0].children[0].children, function (value) {
-            speechText += '<s>Region ' + region + '.</s><s>Category ' + category + '.</s><s>Year' + value.element.name + '</s><s>Revenue ' + value.metrics.Revenue.fv + '</s><s>and the units sold is ' + value.metrics['Units Sold'].fv + '</s>';
+            speechText += '<s>Region ' + region + '.</s><s>Category ' + category + '.</s><s>Year' + value.element.name + '</s><s>Revenue ' + value.metrics.Revenue.fv + '</s><s>and the units sold is ' + value.metrics['Units Sold'].fv + '. </s>';
             speechText += '<break time="1s"/>';
         });
         speechText += "</speak>";

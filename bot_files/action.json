@@ -33,7 +33,7 @@
   "conversations": {
     "test": {
       "name": "test",
-      "url": "https://node-proxy-ab.herokuapp.com/api"
+      "url": "https://77ba8ce0.ngrok.io"
     }
   },
   "locale": "en"

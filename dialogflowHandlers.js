@@ -1,9 +1,9 @@
 const { List, actionssdk } = require('actions-on-google')
-const app = actionssdk({ debug: true });
+const app = actionssdk(/*{ debug: true }*/);
 var helper = require('./helper');
 
 app.intent('actions.intent.MAIN', conv => {
-    conv.ask('Hi welcome to micro strategy. I am Emily, your virtual assistant. Please tell me how can I help you');
+    conv.ask('<speak>Hi <break time="200ms"/> Welcome to Microstrategy. I am Simon, your virtual assistant. Please tell me how can I help you</speak>');
     conv.ask(new List({
         title: 'Please choose',
         items: {
@@ -50,11 +50,15 @@ app.intent('actions.intent.OPTION', (conv, params, option) => {
     }
 });
 
+app.intent('actions.intent.CLOSE', (conv, input) => {
+    conv.ask('Happy to help you.See you later!').close();
+});
 
 app.intent('actions.intent.TEXT', (conv, input) => {
-    console.log(conv.input.raw);
-    if (input === 'bye' || input === 'goodbye') {
-        conv.close('See you later!');
+    console.log("Raw input: " + conv.input.raw);
+    console.log("Input: " + input);
+    if (input === 'bye' || input === 'goodbye' || input == 'close microstrategy'|| input == 'close') {
+        conv.ask('Happy to help you.See you later!').close();
         return;
     }
     return helper.queryDialogflow(conv.input.raw).then((result) => {
@@ -65,21 +69,33 @@ app.intent('actions.intent.TEXT', (conv, input) => {
                 response = result.fulfillment.messages[0].textToSpeech;
                 conv.ask(response);
                 break;
+            case 'ab.thankIntent':
+                response = result.fulfillment.messages[0].textToSpeech;
+                conv.ask(response);
+                break;
+            case 'ab.thankIntent-yes':
+                response = result.fulfillment.messages[0].textToSpeech;
+                conv.ask(response);
+                break;
+            case 'ab.thankIntent-no':
+                response = result.fulfillment.messages[0].textToSpeech;
+                conv.ask(response).close();
+                break;
             case 'ab.getSalesInfo':
                 return helper.salesByRegionReport().then((result) => {
-                    console.log('sales report', result);
+                    console.log('sales report result', result);
                     conv.ask(result);
                 }).catch((err) => {
-                    console.log("some error occured");
+                    console.log("SALES INFO - some error occured");
                     conv.ask("Sorry, something went wrong");
                 });
                 break;
             case 'ab.getCalanderEvent':
                 return helper.getEventReport().then((result) => {
-                    console.log('event report', result);
+                    console.log('event report result', result);
                     conv.ask(result);
                 }).catch((err) => {
-                    console.log("some error occured");
+                    console.log("EVENT REPORT - some error occured");
                     conv.ask("Sorry, something went wrong");
                 });
                 break;
@@ -90,23 +106,3 @@ app.intent('actions.intent.TEXT', (conv, input) => {
 });
 
 module.exports = app;
-
-/*var rawQuery = req.body.inputs[0].rawInputs[0].query;
-console.log("rawQuery", rawQuery);
-let jwtClient = new google.auth.JWT(
-	key.client_email, null, key.private_key,
-	['https://www.googleapis.com/auth/cloud-platform'],
-	null
-);
-jwtClient.authorize((err, tokens) => {
-	request.post(config.dialogFlowAPI.replace('sessions', '123456789'), {
-		'auth': {
-			'bearer': tokens.access_token,
-		},
-		'json': true,
-		'body': { "queryInput": { "text": { "text": rawQuery, "languageCode": "en" } } }
-	}, (err, httpResponse, body) => {
-		console.log(err, body);
-		console.log(httpResponse.statusCode + ': ' + httpResponse.statusMessage);
-	});
-});*/
