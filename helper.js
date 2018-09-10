@@ -82,8 +82,9 @@ var self = {
                     console.log("passed tokrn", mstrAuthToken);
                     var options = {
                         method: 'POST',
-                        url: 'http://172.25.142.36:8075/MicroStrategyLibrary/api/reports/88719C9746FB893117148CACBA0CB92E/instances',
-                        qs: { limit: '3' },
+                        //url: 'http://172.25.142.36:8075/MicroStrategyLibrary/api/reports/88719C9746FB893117148CACBA0CB92E/instances',
+                        url: 'http://172.25.142.36:8075/MicroStrategyLibrary/api/reports/12DC624040860B5401F516A2341D95C8/instances',
+                        qs: { limit: '1000' },
                         headers:
                         {
                             'x-mstr-projectid': 'B19DEDCC11D4E0EFC000EB9495D0F44F',
@@ -219,11 +220,33 @@ var self = {
     "buildSalesReport": function (data) {
         console.log("inside helper buildEventReport");
         var speechText = "", region = "", category = "";
-        region = data[0].element.name;
+        /*region = data[0].element.name;
         category = data[0].children[0].element.name;
         speechText = '<speak>Here are the sales report details <break time="200ms"/>';
         _.forEach(data[0].children[0].children, function (value) {
-            speechText += '<s>Region ' + region + '.</s><s>Category ' + category + '.</s><s>Year' + value.element.name + '</s><s>Revenue ' + value.metrics.Revenue.fv + '</s><s>and the units sold is ' + value.metrics['Units Sold'].fv + '. </s>';
+            console.log(JSON.stringify(value));
+            speechText += '<s>Region ' + region + '.</s><s>Category ' + category + '.</s><s>Year' + value.element.name + '</s>';//<s>Revenue ' + value.metrics.Revenue.fv + '</s><s>and the units sold is ' + value.metrics['Units Sold'].fv + '. </s>';
+            speechText += '<break time="1s"/>';
+        });
+        speechText += "</speak>";*/
+        var metrics;
+        /*_.forEach(headings, function (value, key) {
+            speechText += '<s>' + value.name + '.</s>';
+            speechText += '<break time="1s"/>';
+        });  */
+        speechText = '<speak>Here are the sales report details <break time="200ms"/>';
+        _.forEach(data, function (value, key) {
+            speechText += '<s>Branch Channel ' + value.element.name + '.</s><s>Branch City State ' + value.children[0].element.name + '.</s>';
+            speechText += '<s>Client Full Name ' + value.children[0].children[0].element.name + '.</s>';
+            speechText += '<s>Firm ' + value.children[0].children[0].children[0].element.name + '.</s>';
+            speechText += '<s>Product Group ' + value.children[0].children[0].children[0].children[0].element.name + '.</s>';
+            speechText += '<s>Regional Manager (RM) MF ' + value.children[0].children[0].children[0].children[0].children[0].element.name + '.</s>';
+            metrics = value.children[0].children[0].children[0].children[0].children[0].metrics;
+            speechText += '<s>Branch Rank ' + metrics['Branch Rank'].fv + '</s><s>MF & SMA Current AUM ' + metrics['MF & SMA Current AUM'].fv + '</s>';
+            speechText += '<s>MF & SMA Today Sales' + metrics['MF & SMA Today Sales'].fv + '</s>';
+            speechText += '<s>MF & SMA Pr. Month Sales ' + metrics['MF & SMA Pr. Month Sales'].fv;
+            // + '<s>MF & SMA QTD Reds ' + metrics['MF & SMA QTD Reds'].fv + '</s>';
+            speechText += '<s>RET Current AUM ' + metrics['RET Current AUM'].fv + '</s><s>RET Today Sales ' + metrics['RET Today Sales'].fv + '</s>';
             speechText += '<break time="1s"/>';
         });
         speechText += "</speak>";
