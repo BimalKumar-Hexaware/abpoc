@@ -249,19 +249,19 @@ var self = {
         var speech = new Speech();
         speech.say("Here are the sales report details").pause("200ms")
         _.forEach(data, function (value, key) {
-            speech.sentence("Branch Channel " + value.element.name);
-            speech.sentence("Branch City State " + value.children[0].element.name);
-            speech.sentence("Client Full Name " + value.children[0].children[0].element.name);
-            speech.sentence("Firm " + value.children[0].children[0].children[0].element.name);
-            speech.sentence("Product Group " + value.children[0].children[0].children[0].children[0].element.name);
-            speech.sentence("Regional Manager (RM) MF " + value.children[0].children[0].children[0].children[0].children[0].element.name);
+            speech.sentence("Branch Channel is" + value.element.name);
+            speech.sentence("Branch City State is" + value.children[0].element.name);
+            speech.sentence("Client Full Name is" + value.children[0].children[0].element.name);
+            speech.sentence("Firm is" + value.children[0].children[0].children[0].element.name);
+            speech.sentence("Product Group is" + value.children[0].children[0].children[0].children[0].element.name);
+            speech.sentence("Regional Manager (RM) MF is" + value.children[0].children[0].children[0].children[0].children[0].element.name);
             metrics = value.children[0].children[0].children[0].children[0].children[0].metrics;
             speech.sentence("Branch Rank " + metrics["Branch Rank"].fv);
-            speech.sentence("MF and SMA Current AUM " + metrics["MF & SMA Current AUM"].fv);
-            speech.sentence("MF and SMA Today Sales" + metrics["MF & SMA Today Sales"].fv);
-            speech.sentence("MF and SMA Pr. Month Sales " + metrics["MF & SMA Pr. Month Sales"].fv);
-            speech.sentence("RET Current AUM " + metrics["RET Current AUM"].fv);
-            speech.sentence("RET Today Sales " + metrics["RET Today Sales"].fv).pause("200ms");
+            speech.sentence("MF & SMA Current AUM are" + metrics["MF & SMA Current AUM"].fv);
+            speech.sentence("MF & SMA Today Sales are" + metrics["MF & SMA Today Sales"].fv);
+            speech.sentence("MF & SMA Pr. Month Sales are" + metrics["MF & SMA Pr. Month Sales"].fv);
+            speech.sentence("RET Current AUM are" + metrics["RET Current AUM"].fv);
+            speech.sentence("and RET Today Sales are" + metrics["RET Today Sales"].fv).pause("200ms");
         });
         var speechOutput = speech.ssml();
         return speechOutput;

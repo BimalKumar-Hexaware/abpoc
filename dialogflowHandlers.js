@@ -54,10 +54,14 @@ app.intent('actions.intent.CLOSE', (conv, input) => {
     conv.ask('Happy to help you.See you later!').close();
 });
 
+app.intent('actions.intent.CANCEL', (conv, input) => {
+    conv.ask('Happy to help you.See you later!').close();
+});
+
 app.intent('actions.intent.TEXT', (conv, input) => {
     console.log("Raw input: " + conv.input.raw);
     console.log("Input: " + input);
-    if (input === 'bye' || input === 'goodbye' || input == 'close simon'|| input == 'close') {
+    if (input === 'bye' || input === 'goodbye' || input == 'close simon'|| input == 'close' || input == 'cancel') {
         conv.ask('Happy to help you.See you later!').close();
         return;
     }
