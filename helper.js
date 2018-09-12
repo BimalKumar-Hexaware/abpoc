@@ -218,50 +218,51 @@ var self = {
     },
     "buildEventReport": function (data) {
         console.log("inside helper buildEventReport");
-        var speechText = "", eventAssignedTo = "", eventContactAttendees = "", eventStart = "", eventEnd = "", eventType = "",
-            eventSubject = "", eventLocation = "";
-        var eventStartArray = [], eventEndArray = [];
-        speechText = '<speak>Here are the event report details <break time="200ms"/>';
-        _.forEach(data, function (value) {
-            eventAssignedTo = (value.element.formValues.DESC == "") ? "Unable to find the event assigner informartion" : 'Event assigned to ' + value.element.formValues.DESC;
+        var speech = new Speech();
+        speech.say("Here are the event report details").pause("500ms")
+        _.forEach(data, function (value, key) {
+            eventAssignedTo = (value.element.formValues.DESC == "") ? "Unable to find the event assigner informartion" : 'Event is assigned to ' + value.element.formValues.DESC;
             eventContactAttendees = (value.children[0].element.name == "") ? "no contact attendees found" : "Event contact attendee is " + value.children[0].element.name;
             eventStartArray = value.children[0].children[0].element.name.split(" ");
-            eventStart = '<s>Start date is <say-as interpret-as="date" format="mdy" detail="2">' + eventStartArray[0] + '</say-as><say-as interpret-as="time" format="hm12">' + eventStartArray[1] + ' ' + eventEndArray[2] + '</say-as></s>';
             eventEndArray = value.children[0].children[0].children[0].element.name.split(" ");
-            eventEnd = '<s>End date is <say-as interpret-as="date" format="mdy" detail="2">' + eventEndArray[0] + '</say-as><say-as interpret-as="time" format="hm12">' + eventEndArray[1] + ' ' + eventEndArray[2] + '</say-as></s>';
             eventType = 'Event Type is ' + value.children[0].children[0].children[0].children[0].element.name;
             eventSubject = 'Event subject is ' + value.children[0].children[0].children[0].children[0].children[0].element.name;
-            eventLocation = (value.children[0].children[0].children[0].children[0].children[0].children[0].element.name == "") ? 'Event location is not provided' : 'and the event location is ' + value.children[0].children[0].children[0].children[0].children[0].children[0].element.name;
-            //eventSubject = eventSubject.replace(/\\\//g, "/");;
-            speechText += '<s>' + eventAssignedTo + '.</s>';
-            speechText += '<s>' + eventContactAttendees + '.</s>';
-            speechText += eventStart + eventEnd;
-            speechText += '<s>' + eventType + '.</s>';
-            speechText += '<s>' + eventLocation + '.</s>  ';
-            //<s>' + eventSubject + '</s>
-            speechText += '<break time="1s"/>';
+            eventLocation = (value.children[0].children[0].children[0].children[0].children[0].children[0].element.name == "") ? 'and the Event location is not provided' : 'and the event location is ' + value.children[0].children[0].children[0].children[0].children[0].children[0].element.name;
+            speech.sayAs({ word: key + 1, interpret: 'ordinal'});
+            speech.sentence(eventAssignedTo);
+            speech.sentence(eventContactAttendees);
+            speech.sentence("Start date is ");
+            speech.sayAs({ word: eventStartArray[0] , format: "mdy", interpret:"date" });
+            speech.sayAs({ word: eventStartArray[1] , format: "hm12", interpret:"time" });
+            speech.sentence("End date is ");
+            speech.sayAs({ word: eventEndArray[0] , format: "mdy", interpret:"date" });
+            speech.sayAs({ word: eventEndArray[1] , format: "hm12", interpret:"time" });
+            speech.sentence(eventType);
+            speech.sentence(eventSubject);
+            speech.sentence(eventLocation).pause("500ms");
         });
-        speechText += "</speak>";
-        return speechText;
+        var speechOutput = speech.ssml();
+        return speechOutput;
     },
     "buildSalesReport": function (data) {
         console.log("inside helper buildEventReport");
         var speech = new Speech();
-        speech.say("Here are the sales report details").pause("200ms")
+        speech.say("Here are the sales report details").pause("500ms")
         _.forEach(data, function (value, key) {
-            speech.sentence("Branch Channel is" + value.element.name);
-            speech.sentence("Branch City State is" + value.children[0].element.name);
-            speech.sentence("Client Full Name is" + value.children[0].children[0].element.name);
-            speech.sentence("Firm is" + value.children[0].children[0].children[0].element.name);
-            speech.sentence("Product Group is" + value.children[0].children[0].children[0].children[0].element.name);
-            speech.sentence("Regional Manager (RM) MF is" + value.children[0].children[0].children[0].children[0].children[0].element.name);
+            speech.sayAs({ word: key + 1, interpret: 'ordinal' });
+            speech.sentence("Branch Channel is " + value.element.name);
+            speech.sentence("Branch City State is " + value.children[0].element.name);
+            speech.sentence("Client Full Name is " + value.children[0].children[0].element.name);
+            speech.sentence("Firm is " + value.children[0].children[0].children[0].element.name);
+            speech.sentence("Product Group is " + value.children[0].children[0].children[0].children[0].element.name);
+            speech.sentence("Regional Manager (RM) MF is " + value.children[0].children[0].children[0].children[0].children[0].element.name);
             metrics = value.children[0].children[0].children[0].children[0].children[0].metrics;
-            speech.sentence("Branch Rank " + metrics["Branch Rank"].fv);
-            speech.sentence("MF & SMA Current AUM are" + metrics["MF & SMA Current AUM"].fv);
-            speech.sentence("MF & SMA Today Sales are" + metrics["MF & SMA Today Sales"].fv);
-            speech.sentence("MF & SMA Pr. Month Sales are" + metrics["MF & SMA Pr. Month Sales"].fv);
-            speech.sentence("RET Current AUM are" + metrics["RET Current AUM"].fv);
-            speech.sentence("and RET Today Sales are" + metrics["RET Today Sales"].fv).pause("200ms");
+            speech.sentence("Branch Rank is " + metrics["Branch Rank"].fv);
+            speech.sentence("MF & SMA Current AUM are " + metrics["MF & SMA Current AUM"].fv);
+            speech.sentence("MF & SMA Today Sales are " + metrics["MF & SMA Today Sales"].fv);
+            speech.sentence("MF & SMA Pr. Month Sales are " + metrics["MF & SMA Pr. Month Sales"].fv);
+            speech.sentence("RET Current AUM are " + metrics["RET Current AUM"].fv);
+            speech.sentence("and RET Today Sales are " + metrics["RET Today Sales"].fv).pause("500ms");
         });
         var speechOutput = speech.ssml();
         return speechOutput;
