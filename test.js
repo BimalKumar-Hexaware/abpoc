@@ -7,7 +7,8 @@ const port = process.env.PORT || 8880;
 app.get('/test', (req, res) => {
     return helper.salesByRegionReport().then((result) => {
         //console.log('result', JSON.parse(result).header);
-        res.json(result);
+        console.log("RES",result);
+        res.send("Sss");
     }).catch((err) => {
         console.log("some error occured");
         res.send(err);

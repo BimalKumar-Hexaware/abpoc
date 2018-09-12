@@ -4,6 +4,7 @@ var async = require('async');
 var botConfig = require('./abmspoc-e6fa7-9b84f81aec59.json');
 var requestWithJWT = require('google-oauth-jwt').requestWithJWT();
 var _ = require('lodash');
+var Speech = require('ssml-builder');
 
 var self = {
     "queryDialogflow": function (rawQuery) {
@@ -101,6 +102,7 @@ var self = {
                         if (error) {
                             reject("Event request error", error);
                         }
+                        //var salesReport = self.buildSalesReportDynamic(body.result.data.root.children,{},0);
                         var salesReport = self.buildSalesReport(body.result.data.root.children);
                         resolve(salesReport);
                     });
@@ -113,6 +115,31 @@ var self = {
                 }
             });
         });
+    },
+    "buildSalesReportDynamic": function (records, items, index) {
+        var result = { "records": [] };
+
+
+        _.forEach(records, function (value, key) {
+
+            if (value.depth == 0) {
+                items.push(value.element.name);
+                result.records[key] = items;
+            }
+
+            if (value.children.length == 1) {
+                items.push(value.element.name);
+                result.records[key] = items;
+                if (value.children[0].children) {
+                    self.buildSalesReportDynamic(value.children[0].children, items, key);
+                }
+            } else {
+                self.buildSalesReportDynamic(value.children, items, key);
+            }
+            items = [];
+        });
+
+        return result;
     },
     "getEventReport": function () {
         console.log("inside helper getEventReport");
@@ -159,7 +186,7 @@ var self = {
                     var options = {
                         method: 'POST',
                         url: 'http://172.25.142.36:8075/MicroStrategyLibrary/api/reports/B85A18A944D682077AD280BD71DFE38E/instances',
-                        qs: { limit: '3' },
+                        qs: { limit: '1000' },
                         headers:
                         {
                             'x-mstr-projectid': 'B19DEDCC11D4E0EFC000EB9495D0F44F',
@@ -219,38 +246,25 @@ var self = {
     },
     "buildSalesReport": function (data) {
         console.log("inside helper buildEventReport");
-        var speechText = "", region = "", category = "";
-        /*region = data[0].element.name;
-        category = data[0].children[0].element.name;
-        speechText = '<speak>Here are the sales report details <break time="200ms"/>';
-        _.forEach(data[0].children[0].children, function (value) {
-            console.log(JSON.stringify(value));
-            speechText += '<s>Region ' + region + '.</s><s>Category ' + category + '.</s><s>Year' + value.element.name + '</s>';//<s>Revenue ' + value.metrics.Revenue.fv + '</s><s>and the units sold is ' + value.metrics['Units Sold'].fv + '. </s>';
-            speechText += '<break time="1s"/>';
-        });
-        speechText += "</speak>";*/
-        var metrics;
-        /*_.forEach(headings, function (value, key) {
-            speechText += '<s>' + value.name + '.</s>';
-            speechText += '<break time="1s"/>';
-        });  */
-        speechText = '<speak>Here are the sales report details <break time="200ms"/>';
+        var speech = new Speech();
+        speech.say("Here are the sales report details").pause("200ms")
         _.forEach(data, function (value, key) {
-            speechText += '<s>Branch Channel ' + value.element.name + '.</s><s>Branch City State ' + value.children[0].element.name + '.</s>';
-            speechText += '<s>Client Full Name ' + value.children[0].children[0].element.name + '.</s>';
-            speechText += '<s>Firm ' + value.children[0].children[0].children[0].element.name + '.</s>';
-            speechText += '<s>Product Group ' + value.children[0].children[0].children[0].children[0].element.name + '.</s>';
-            speechText += '<s>Regional Manager (RM) MF ' + value.children[0].children[0].children[0].children[0].children[0].element.name + '.</s>';
+            speech.sentence("Branch Channel " + value.element.name);
+            speech.sentence("Branch City State " + value.children[0].element.name);
+            speech.sentence("Client Full Name " + value.children[0].children[0].element.name);
+            speech.sentence("Firm " + value.children[0].children[0].children[0].element.name);
+            speech.sentence("Product Group " + value.children[0].children[0].children[0].children[0].element.name);
+            speech.sentence("Regional Manager (RM) MF " + value.children[0].children[0].children[0].children[0].children[0].element.name);
             metrics = value.children[0].children[0].children[0].children[0].children[0].metrics;
-            speechText += '<s>Branch Rank ' + metrics['Branch Rank'].fv + '</s><s>MF & SMA Current AUM ' + metrics['MF & SMA Current AUM'].fv + '</s>';
-            speechText += '<s>MF & SMA Today Sales' + metrics['MF & SMA Today Sales'].fv + '</s>';
-            speechText += '<s>MF & SMA Pr. Month Sales ' + metrics['MF & SMA Pr. Month Sales'].fv;
-            // + '<s>MF & SMA QTD Reds ' + metrics['MF & SMA QTD Reds'].fv + '</s>';
-            speechText += '<s>RET Current AUM ' + metrics['RET Current AUM'].fv + '</s><s>RET Today Sales ' + metrics['RET Today Sales'].fv + '</s>';
-            speechText += '<break time="1s"/>';
+            speech.sentence("Branch Rank " + metrics["Branch Rank"].fv);
+            speech.sentence("MF and SMA Current AUM " + metrics["MF & SMA Current AUM"].fv);
+            speech.sentence("MF and SMA Today Sales" + metrics["MF & SMA Today Sales"].fv);
+            speech.sentence("MF and SMA Pr. Month Sales " + metrics["MF & SMA Pr. Month Sales"].fv);
+            speech.sentence("RET Current AUM " + metrics["RET Current AUM"].fv);
+            speech.sentence("RET Today Sales " + metrics["RET Today Sales"].fv).pause("200ms");
         });
-        speechText += "</speak>";
-        return speechText;
+        var speechOutput = speech.ssml();
+        return speechOutput;
     },
     "getSalesInfo": function (rprtId) {
         //EE5687854B3A8B7C9144AA9C0BB2FD75
