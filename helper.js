@@ -102,7 +102,6 @@ var self = {
                         if (error) {
                             reject("Event request error", error);
                         }
-                        //var salesReport = self.buildSalesReportDynamic(body.result.data.root.children,{},0);
                         var salesReport = self.buildSalesReport(body.result.data.root.children);
                         resolve(salesReport);
                     });
@@ -115,31 +114,6 @@ var self = {
                 }
             });
         });
-    },
-    "buildSalesReportDynamic": function (records, items, index) {
-        var result = { "records": [] };
-
-
-        _.forEach(records, function (value, key) {
-
-            if (value.depth == 0) {
-                items.push(value.element.name);
-                result.records[key] = items;
-            }
-
-            if (value.children.length == 1) {
-                items.push(value.element.name);
-                result.records[key] = items;
-                if (value.children[0].children) {
-                    self.buildSalesReportDynamic(value.children[0].children, items, key);
-                }
-            } else {
-                self.buildSalesReportDynamic(value.children, items, key);
-            }
-            items = [];
-        });
-
-        return result;
     },
     "getEventReport": function () {
         console.log("inside helper getEventReport");
@@ -186,7 +160,7 @@ var self = {
                     var options = {
                         method: 'POST',
                         url: 'http://172.25.142.36:8075/MicroStrategyLibrary/api/reports/B85A18A944D682077AD280BD71DFE38E/instances',
-                        qs: { limit: '1000' },
+                        qs: { limit: '6' },
                         headers:
                         {
                             'x-mstr-projectid': 'B19DEDCC11D4E0EFC000EB9495D0F44F',
@@ -203,7 +177,7 @@ var self = {
                         if (error) {
                             reject("Event request error", error);
                         }
-                        var eventReport = self.buildEventReport(body.result.data.root.children);
+                        var eventReport = self.buildEventReport(body);
                         resolve(eventReport);
                     });
 
@@ -218,31 +192,64 @@ var self = {
     },
     "buildEventReport": function (data) {
         console.log("inside helper buildEventReport");
+        var result = { "records": [], "columns": [] };
+        _.forEach(data.result.definition.attributes, function (value, key) {
+            result.columns.push(value.name);
+        });
+        result = self.buildLinearArrayFromTree(data.result.data.root.children, result, [], 0);
+
+
         var speech = new Speech();
-        speech.say("Here are the event report details").pause("500ms")
-        _.forEach(data, function (value, key) {
-            eventAssignedTo = (value.element.formValues.DESC == "") ? "Unable to find the event assigner informartion" : 'Event is assigned to ' + value.element.formValues.DESC;
-            eventContactAttendees = (value.children[0].element.name == "") ? "no contact attendees found" : "Event contact attendee is " + value.children[0].element.name;
-            eventStartArray = value.children[0].children[0].element.name.split(" ");
-            eventEndArray = value.children[0].children[0].children[0].element.name.split(" ");
-            eventType = 'Event Type is ' + value.children[0].children[0].children[0].children[0].element.name;
-            eventSubject = 'Event subject is ' + value.children[0].children[0].children[0].children[0].children[0].element.name;
-            eventLocation = (value.children[0].children[0].children[0].children[0].children[0].children[0].element.name == "") ? 'and the Event location is not provided' : 'and the event location is ' + value.children[0].children[0].children[0].children[0].children[0].children[0].element.name;
-            speech.sayAs({ word: key + 1, interpret: 'ordinal'});
+        speech.say("Here are the event report details").pause("500ms");
+        _.forEach(result.records, function (value, key) {
+            eventAssignedTo = (value[0].name == "") ? result.columns[0] + " none" : " " + result.columns[0] + " " + value[0].name;
+            eventContactAttendees = (value[1].name == "") ? result.columns[1] + " none" : " " + result.columns[1] + " " + value[1].name;
+            eventStartArray = value[2].name.split(" ");
+            eventEndArray = value[3].name.split(" ");
+            eventType = (value[4].name == "") ? result.columns[4] + " none" : result.columns[4] + " " + value[4].name;
+            eventSubject = (value[5].name == "") ? result.columns[5] + " none" : " " + result.columns[5] + " " + value[5].name;
+            if (typeof value[6] != "undefined") {
+                eventLocation = (value[6].name == "") ? result.columns[6] + " none" : " " + result.columns[6] + " " + value[6].name;
+            } else {
+                eventLocation = result.columns[6] + " none";
+            }
+            speech.sayAs({ word: key + 1, interpret: 'ordinal' });
             speech.sentence(eventAssignedTo);
             speech.sentence(eventContactAttendees);
-            speech.sentence("Start date is ");
-            speech.sayAs({ word: eventStartArray[0] , format: "mdy", interpret:"date" });
-            speech.sayAs({ word: eventStartArray[1] , format: "hm12", interpret:"time" });
-            speech.sentence("End date is ");
-            speech.sayAs({ word: eventEndArray[0] , format: "mdy", interpret:"date" });
-            speech.sayAs({ word: eventEndArray[1] , format: "hm12", interpret:"time" });
+            speech.sentence(result.columns[2]);
+            speech.sayAs({ word: eventStartArray[0], format: "mdy", interpret: "date" });
+            speech.sayAs({ word: eventStartArray[1] + eventStartArray[2], format: "hm12", interpret: "time" });
+            speech.sentence(result.columns[3]);
+            speech.sayAs({ word: eventEndArray[0], format: "mdy", interpret: "date" });
+            speech.sayAs({ word: eventEndArray[1] + eventEndArray[2], format: "hm12", interpret: "time" });
             speech.sentence(eventType);
             speech.sentence(eventSubject);
-            speech.sentence(eventLocation).pause("500ms");
+            speech.sentence(eventLocation).pause("500ms")
         });
         var speechOutput = speech.ssml();
         return speechOutput;
+    },
+    "buildLinearArrayFromTree": function (records, result, items, index) {
+        _.forEach(records, function (value, key) {
+
+            items.push({ "depth": value.depth, "name": value.element.name });
+            result.records[index] = items;
+
+            if (typeof value.children != "undefined") {
+                self.buildLinearArrayFromTree(value.children, result, items, index);
+            } else {
+                /*if(typeof value.metrics !== "undefined") {
+                    _.forEach(value.metrics, function (v, k) {
+                        items.push({mkey:k,mval:v.fv});
+                        result.records[index] = items;
+                    });
+                }*/
+            }
+            index++;
+            items = [];
+        });
+
+        return result;
     },
     "buildSalesReport": function (data) {
         console.log("inside helper buildEventReport");
