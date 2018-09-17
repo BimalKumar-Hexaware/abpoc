@@ -197,34 +197,36 @@ var self = {
             result.columns.push(value.name);
         });
         result = self.buildLinearArrayFromTree(data.result.data.root.children, result, [], 0);
-
+        console.log("RES", result);
 
         var speech = new Speech();
         speech.say("Here are the event report details").pause("500ms");
         _.forEach(result.records, function (value, key) {
-            eventAssignedTo = (value[0].name == "") ? result.columns[0] + " none" : " " + result.columns[0] + " " + value[0].name;
-            eventContactAttendees = (value[1].name == "") ? result.columns[1] + " none" : " " + result.columns[1] + " " + value[1].name;
-            eventStartArray = value[2].name.split(" ");
-            eventEndArray = value[3].name.split(" ");
-            eventType = (value[4].name == "") ? result.columns[4] + " none" : result.columns[4] + " " + value[4].name;
-            eventSubject = (value[5].name == "") ? result.columns[5] + " none" : " " + result.columns[5] + " " + value[5].name;
-            if (typeof value[6] != "undefined") {
-                eventLocation = (value[6].name == "") ? result.columns[6] + " none" : " " + result.columns[6] + " " + value[6].name;
-            } else {
-                eventLocation = result.columns[6] + " none";
+
+            for (var j = 0; j < result.columns.length; j++) {
+                var sentence = "", field = "", dateArray = [];
+                if (typeof value[j] != "undefined") {
+                    field = value[j].name;
+                    if (field == "") {
+                        sentence = result.columns[j] + " none";
+                        speech.sentence(sentence);
+                    } else {
+                        if (field.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4}) (\d{1,2}):(\d{1,2}):(\d{1,2}) (?:AM|PM|am|pm)$/)) {
+                            dateArray = field.split(" ");
+                            speech.sentence(result.columns[j]);
+                            speech.sayAs({ word: dateArray[0], format: "mdy", interpret: "date" });
+                            speech.sayAs({ word: dateArray[1] + dateArray[2], format: "hm12", interpret: "time" });
+                        } else {
+                            sentence = result.columns[j] + " " + value[j].name;
+                            speech.sentence(sentence);
+                        }
+                    }
+                } else {
+                    sentence = result.columns[j] + " none";
+                    speech.sentence(sentence);
+                }
             }
-            speech.sayAs({ word: key + 1, interpret: 'ordinal' });
-            speech.sentence(eventAssignedTo);
-            speech.sentence(eventContactAttendees);
-            speech.sentence(result.columns[2]);
-            speech.sayAs({ word: eventStartArray[0], format: "mdy", interpret: "date" });
-            speech.sayAs({ word: eventStartArray[1] + eventStartArray[2], format: "hm12", interpret: "time" });
-            speech.sentence(result.columns[3]);
-            speech.sayAs({ word: eventEndArray[0], format: "mdy", interpret: "date" });
-            speech.sayAs({ word: eventEndArray[1] + eventEndArray[2], format: "hm12", interpret: "time" });
-            speech.sentence(eventType);
-            speech.sentence(eventSubject);
-            speech.sentence(eventLocation).pause("500ms")
+            speech.pause("500ms");
         });
         var speechOutput = speech.ssml();
         return speechOutput;
