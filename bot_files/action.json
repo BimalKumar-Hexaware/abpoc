@@ -10,7 +10,7 @@
         "name": "actions.intent.MAIN",
         "trigger": {
           "queryPatterns": [
-            "talk to microstrategy"
+            "talk to Simon"
           ]
         }
       }
