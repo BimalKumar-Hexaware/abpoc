@@ -4,7 +4,7 @@
   "description": "Alliance bernstein microstrategy",
   "main": "index.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "forever start app.js",
     "stop": "forever stop app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -26,6 +26,8 @@
     "google-oauth-jwt": "^0.2.0",
     "googleapis": "^32.0.0",
     "http": "0.0.0",
-    "request": "^2.87.0"
+    "lodash": "^4.17.10",
+    "request": "^2.87.0",
+    "string-kit": "^0.8.12"
   }
 }

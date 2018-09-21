@@ -3,13 +3,14 @@ var request = require('request');
 var async = require('async');
 var botConfig = require('./abmspoc-e6fa7-9b84f81aec59.json');
 var requestWithJWT = require('google-oauth-jwt').requestWithJWT();
+var _ = require('lodash');
 
-module.exports = {
+var self = {
     "queryDialogflow": function (rawQuery) {
         console.log('inside queryDialogflow');
         return new Promise(function (resolve, reject) {
             var options = {
-                proxy: 'http://gmdvproxy.acml.com:8080/',
+                //proxy: 'http://gmdvproxy.acml.com:8080/',
                 method: 'POST',
                 url: config.dialogflowV1API,
                 headers:
@@ -35,6 +36,221 @@ module.exports = {
                 resolve(body.result);
             });
         });
+    },
+    "salesByRegionReport": function () {
+        console.log("inside helper salesByRegionReport");
+        return new Promise(function (resolve, reject) {
+            async.waterfall([
+                function (cb) {
+                    var options = {
+                        method: 'POST',
+                        url: 'http://172.25.142.36:8075/MicroStrategyLibrary/api/auth/login',
+                        headers:
+                        {
+                            accept: 'text/html',
+                            'content-type': 'application/json'
+                        },
+                        body:
+                        {
+                            username: 'Administrator',
+                            password: '',
+                            loginMode: 1,
+                            maxSearch: 3,
+                            workingSet: 0,
+                            changePassword: false,
+                            newPassword: 'string',
+                            metadataLocale: 'en_us',
+                            warehouseDataLocale: 'en_us',
+                            displayLocale: 'en_us',
+                            messagesLocale: 'en_us',
+                            numberLocale: 'en_us',
+                            timeZone: 'UTC',
+                            applicationType: 35
+                        },
+                        json: true
+                    };
+                    request(options, function (error, response, body) {
+                        if (error) {
+                            reject("Auth request error", error);
+                        }
+                        console.log('FIRST HEADER', response.headers['set-cookie']);
+                        console.log('HEADER x-mstr-authtoken', response.headers['x-mstr-authtoken']);
+                        cb(null, response.headers['x-mstr-authtoken'], response.headers['set-cookie']);
+                    });
+                },
+                function (mstrAuthToken, cookie) {
+                    console.log("passed tokrn", mstrAuthToken);
+                    var options = {
+                        method: 'POST',
+                        //url: 'http://172.25.142.36:8075/MicroStrategyLibrary/api/reports/88719C9746FB893117148CACBA0CB92E/instances',
+                        url: 'http://172.25.142.36:8075/MicroStrategyLibrary/api/reports/12DC624040860B5401F516A2341D95C8/instances',
+                        qs: { limit: '1000' },
+                        headers:
+                        {
+                            'x-mstr-projectid': 'B19DEDCC11D4E0EFC000EB9495D0F44F',
+                            'x-mstr-authtoken': mstrAuthToken,
+                            accept: 'application/json',
+                            'content-type': 'application/json',
+                            'Cookie': cookie,
+                        },
+                        body: {},
+                        json: true
+                    };
+                    console.log("event request options", options);
+                    request(options, function (error, response, body) {
+                        if (error) {
+                            reject("Event request error", error);
+                        }
+                        var salesReport = self.buildSalesReport(body.result.data.root.children);
+                        resolve(salesReport);
+                    });
+
+                }
+            ], function (error) {
+                if (error) {
+                    console.log("ERROR: ", error);
+                    reject("Something went wrong!");
+                }
+            });
+        });
+    },
+    "getEventReport": function () {
+        console.log("inside helper getEventReport");
+        return new Promise(function (resolve, reject) {
+            async.waterfall([
+                function (cb) {
+                    var options = {
+                        method: 'POST',
+                        url: 'http://172.25.142.36:8075/MicroStrategyLibrary/api/auth/login',
+                        headers:
+                        {
+                            accept: 'text/html',
+                            'content-type': 'application/json'
+                        },
+                        body:
+                        {
+                            username: 'Administrator',
+                            password: '',
+                            loginMode: 1,
+                            maxSearch: 3,
+                            workingSet: 0,
+                            changePassword: false,
+                            newPassword: 'string',
+                            metadataLocale: 'en_us',
+                            warehouseDataLocale: 'en_us',
+                            displayLocale: 'en_us',
+                            messagesLocale: 'en_us',
+                            numberLocale: 'en_us',
+                            timeZone: 'UTC',
+                            applicationType: 35
+                        },
+                        json: true
+                    };
+                    request(options, function (error, response, body) {
+                        if (error) {
+                            reject("Auth request error", error);
+                        }
+                        console.log('HEADER x-mstr-authtoken', response.headers['x-mstr-authtoken']);
+                        cb(null, response.headers['x-mstr-authtoken'], response.headers['set-cookie']);
+                    });
+                },
+                function (mstrAuthToken, cookie) {
+                    console.log("passed tokrn", mstrAuthToken);
+                    var options = {
+                        method: 'POST',
+                        url: 'http://172.25.142.36:8075/MicroStrategyLibrary/api/reports/B85A18A944D682077AD280BD71DFE38E/instances',
+                        qs: { limit: '3' },
+                        headers:
+                        {
+                            'x-mstr-projectid': 'B19DEDCC11D4E0EFC000EB9495D0F44F',
+                            'x-mstr-authtoken': mstrAuthToken,
+                            accept: 'application/json',
+                            'content-type': 'application/json',
+                            'Cookie': cookie
+                        },
+                        body: {},
+                        json: true
+                    };
+                    console.log("event request options", options);
+                    request(options, function (error, response, body) {
+                        if (error) {
+                            reject("Event request error", error);
+                        }
+                        var eventReport = self.buildEventReport(body.result.data.root.children);
+                        resolve(eventReport);
+                    });
+
+                }
+            ], function (error) {
+                if (error) {
+                    console.log("ERROR: ", error);
+                    reject("Something went wrong!");
+                }
+            });
+        });
+    },
+    "buildEventReport": function (data) {
+        console.log("inside helper buildEventReport");
+        var speechText = "", eventAssignedTo = "", eventContactAttendees = "", eventStart = "", eventEnd = "", eventType = "",
+            eventSubject = "", eventLocation = "";
+        var eventStartArray = [], eventEndArray = [];
+        speechText = '<speak>Here are the event report details <break time="200ms"/>';
+        _.forEach(data, function (value) {
+            eventAssignedTo = (value.element.formValues.DESC == "") ? "Unable to find the event assigner informartion" : 'Event assigned to ' + value.element.formValues.DESC;
+            eventContactAttendees = (value.children[0].element.name == "") ? "no contact attendees found" : "Event contact attendee is " + value.children[0].element.name;
+            eventStartArray = value.children[0].children[0].element.name.split(" ");
+            eventStart = '<s>Start date is <say-as interpret-as="date" format="mdy" detail="2">' + eventStartArray[0] + '</say-as><say-as interpret-as="time" format="hm12">' + eventStartArray[1] + ' ' + eventEndArray[2] + '</say-as></s>';
+            eventEndArray = value.children[0].children[0].children[0].element.name.split(" ");
+            eventEnd = '<s>End date is <say-as interpret-as="date" format="mdy" detail="2">' + eventEndArray[0] + '</say-as><say-as interpret-as="time" format="hm12">' + eventEndArray[1] + ' ' + eventEndArray[2] + '</say-as></s>';
+            eventType = 'Event Type is ' + value.children[0].children[0].children[0].children[0].element.name;
+            eventSubject = 'Event subject is ' + value.children[0].children[0].children[0].children[0].children[0].element.name;
+            eventLocation = (value.children[0].children[0].children[0].children[0].children[0].children[0].element.name == "") ? 'Event location is not provided' : 'and the event location is ' + value.children[0].children[0].children[0].children[0].children[0].children[0].element.name;
+            //eventSubject = eventSubject.replace(/\\\//g, "/");;
+            speechText += '<s>' + eventAssignedTo + '.</s>';
+            speechText += '<s>' + eventContactAttendees + '.</s>';
+            speechText += eventStart + eventEnd;
+            speechText += '<s>' + eventType + '.</s>';
+            speechText += '<s>' + eventLocation + '.</s>  ';
+            //<s>' + eventSubject + '</s>
+            speechText += '<break time="1s"/>';
+        });
+        speechText += "</speak>";
+        return speechText;
+    },
+    "buildSalesReport": function (data) {
+        console.log("inside helper buildEventReport");
+        var speechText = "", region = "", category = "";
+        /*region = data[0].element.name;
+        category = data[0].children[0].element.name;
+        speechText = '<speak>Here are the sales report details <break time="200ms"/>';
+        _.forEach(data[0].children[0].children, function (value) {
+            console.log(JSON.stringify(value));
+            speechText += '<s>Region ' + region + '.</s><s>Category ' + category + '.</s><s>Year' + value.element.name + '</s>';//<s>Revenue ' + value.metrics.Revenue.fv + '</s><s>and the units sold is ' + value.metrics['Units Sold'].fv + '. </s>';
+            speechText += '<break time="1s"/>';
+        });
+        speechText += "</speak>";*/
+        var metrics;
+        /*_.forEach(headings, function (value, key) {
+            speechText += '<s>' + value.name + '.</s>';
+            speechText += '<break time="1s"/>';
+        });  */
+        speechText = '<speak>Here are the sales report details <break time="200ms"/>';
+        _.forEach(data, function (value, key) {
+            speechText += '<s>Branch Channel ' + value.element.name + '.</s><s>Branch City State ' + value.children[0].element.name + '.</s>';
+            speechText += '<s>Client Full Name ' + value.children[0].children[0].element.name + '.</s>';
+            speechText += '<s>Firm ' + value.children[0].children[0].children[0].element.name + '.</s>';
+            speechText += '<s>Product Group ' + value.children[0].children[0].children[0].children[0].element.name + '.</s>';
+            speechText += '<s>Regional Manager (RM) MF ' + value.children[0].children[0].children[0].children[0].children[0].element.name + '.</s>';
+            metrics = value.children[0].children[0].children[0].children[0].children[0].metrics;
+            speechText += '<s>Branch Rank ' + metrics['Branch Rank'].fv + '</s><s>MF & SMA Current AUM ' + metrics['MF & SMA Current AUM'].fv + '</s>';
+            speechText += '<s>MF & SMA Today Sales' + metrics['MF & SMA Today Sales'].fv + '</s>';
+            speechText += '<s>MF & SMA Pr. Month Sales ' + metrics['MF & SMA Pr. Month Sales'].fv;
+            // + '<s>MF & SMA QTD Reds ' + metrics['MF & SMA QTD Reds'].fv + '</s>';
+            speechText += '<s>RET Current AUM ' + metrics['RET Current AUM'].fv + '</s><s>RET Today Sales ' + metrics['RET Today Sales'].fv + '</s>';
+            speechText += '<break time="1s"/>';
+        });
+        speechText += "</speak>";
+        return speechText;
     },
     "getSalesInfo": function (rprtId) {
         //EE5687854B3A8B7C9144AA9C0BB2FD75
@@ -154,3 +370,5 @@ module.exports = {
         });
     }
 };
+
+module.exports = self;
