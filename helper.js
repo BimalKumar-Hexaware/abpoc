@@ -4,6 +4,8 @@ var async = require('async');
 var botConfig = require('./abmspoc-e6fa7-9b84f81aec59.json');
 var requestWithJWT = require('google-oauth-jwt').requestWithJWT();
 var _ = require('lodash');
+var Speech = require('ssml-builder');
+var microstrategyBaseUrl = "http://172.25.209.12:8080";
 
 var self = {
     "queryDialogflow": function (rawQuery) {
@@ -44,7 +46,7 @@ var self = {
                 function (cb) {
                     var options = {
                         method: 'POST',
-                        url: 'http://172.25.142.36:8075/MicroStrategyLibrary/api/auth/login',
+                        url: microstrategyBaseUrl + '/MicroStrategyLibrary/api/auth/login',
                         headers:
                         {
                             accept: 'text/html',
@@ -83,7 +85,7 @@ var self = {
                     var options = {
                         method: 'POST',
                         //url: 'http://172.25.142.36:8075/MicroStrategyLibrary/api/reports/88719C9746FB893117148CACBA0CB92E/instances',
-                        url: 'http://172.25.142.36:8075/MicroStrategyLibrary/api/reports/12DC624040860B5401F516A2341D95C8/instances',
+                        url: microstrategyBaseUrl + '/MicroStrategyLibrary/api/reports/12DC624040860B5401F516A2341D95C8/instances',
                         qs: { limit: '1000' },
                         headers:
                         {
@@ -121,7 +123,7 @@ var self = {
                 function (cb) {
                     var options = {
                         method: 'POST',
-                        url: 'http://172.25.142.36:8075/MicroStrategyLibrary/api/auth/login',
+                        url: microstrategyBaseUrl + '/MicroStrategyLibrary/api/auth/login',
                         headers:
                         {
                             accept: 'text/html',
@@ -158,8 +160,8 @@ var self = {
                     console.log("passed tokrn", mstrAuthToken);
                     var options = {
                         method: 'POST',
-                        url: 'http://172.25.142.36:8075/MicroStrategyLibrary/api/reports/B85A18A944D682077AD280BD71DFE38E/instances',
-                        qs: { limit: '3' },
+                        url: microstrategyBaseUrl + '/MicroStrategyLibrary/api/reports/B85A18A944D682077AD280BD71DFE38E/instances',
+                        qs: { limit: '6' },
                         headers:
                         {
                             'x-mstr-projectid': 'B19DEDCC11D4E0EFC000EB9495D0F44F',
@@ -176,7 +178,7 @@ var self = {
                         if (error) {
                             reject("Event request error", error);
                         }
-                        var eventReport = self.buildEventReport(body.result.data.root.children);
+                        var eventReport = self.buildEventReport(body);
                         resolve(eventReport);
                     });
 
@@ -191,66 +193,89 @@ var self = {
     },
     "buildEventReport": function (data) {
         console.log("inside helper buildEventReport");
-        var speechText = "", eventAssignedTo = "", eventContactAttendees = "", eventStart = "", eventEnd = "", eventType = "",
-            eventSubject = "", eventLocation = "";
-        var eventStartArray = [], eventEndArray = [];
-        speechText = '<speak>Here are the event report details <break time="200ms"/>';
-        _.forEach(data, function (value) {
-            eventAssignedTo = (value.element.formValues.DESC == "") ? "Unable to find the event assigner informartion" : 'Event assigned to ' + value.element.formValues.DESC;
-            eventContactAttendees = (value.children[0].element.name == "") ? "no contact attendees found" : "Event contact attendee is " + value.children[0].element.name;
-            eventStartArray = value.children[0].children[0].element.name.split(" ");
-            eventStart = '<s>Start date is <say-as interpret-as="date" format="mdy" detail="2">' + eventStartArray[0] + '</say-as><say-as interpret-as="time" format="hm12">' + eventStartArray[1] + ' ' + eventEndArray[2] + '</say-as></s>';
-            eventEndArray = value.children[0].children[0].children[0].element.name.split(" ");
-            eventEnd = '<s>End date is <say-as interpret-as="date" format="mdy" detail="2">' + eventEndArray[0] + '</say-as><say-as interpret-as="time" format="hm12">' + eventEndArray[1] + ' ' + eventEndArray[2] + '</say-as></s>';
-            eventType = 'Event Type is ' + value.children[0].children[0].children[0].children[0].element.name;
-            eventSubject = 'Event subject is ' + value.children[0].children[0].children[0].children[0].children[0].element.name;
-            eventLocation = (value.children[0].children[0].children[0].children[0].children[0].children[0].element.name == "") ? 'Event location is not provided' : 'and the event location is ' + value.children[0].children[0].children[0].children[0].children[0].children[0].element.name;
-            //eventSubject = eventSubject.replace(/\\\//g, "/");;
-            speechText += '<s>' + eventAssignedTo + '.</s>';
-            speechText += '<s>' + eventContactAttendees + '.</s>';
-            speechText += eventStart + eventEnd;
-            speechText += '<s>' + eventType + '.</s>';
-            speechText += '<s>' + eventLocation + '.</s>  ';
-            //<s>' + eventSubject + '</s>
-            speechText += '<break time="1s"/>';
+        var result = { "records": [], "columns": [] };
+        _.forEach(data.result.definition.attributes, function (value, key) {
+            result.columns.push(value.name);
         });
-        speechText += "</speak>";
-        return speechText;
+        result = self.buildLinearArrayFromTree(data.result.data.root.children, result, [], 0);
+        console.log("RES", result);
+
+        var speech = new Speech();
+        speech.say("Here are the event report details").pause("500ms");
+        _.forEach(result.records, function (value, key) {
+            speech.sayAs({ word: key + 1, interpret: 'ordinal' });
+            for (var j = 0; j < result.columns.length; j++) {
+                var sentence = "", field = "", dateArray = [];
+                if (typeof value[j] != "undefined") {
+                    field = value[j].name;
+                    if (field == "") {
+                        sentence = result.columns[j] + " none";
+                        speech.sentence(sentence);
+                    } else {
+                        if (field.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4}) (\d{1,2}):(\d{1,2}):(\d{1,2}) (?:AM|PM|am|pm)$/)) {
+                            dateArray = field.split(" ");
+                            speech.sentence(result.columns[j] + " ");
+                            speech.sayAs({ word: dateArray[0], format: "mdy", interpret: "date" });
+                            speech.sayAs({ word: dateArray[1] + dateArray[2], format: "hm12", interpret: "time" });
+                        } else {
+                            sentence = result.columns[j] + " " + value[j].name;
+                            speech.sentence(sentence);
+                        }
+                    }
+                } else {
+                    sentence = result.columns[j] + " none";
+                    speech.sentence(sentence);
+                }
+            }
+            speech.pause("500ms");
+        });
+        var speechOutput = speech.ssml();
+        return speechOutput;
+    },
+    "buildLinearArrayFromTree": function (records, result, items, index) {
+        _.forEach(records, function (value, key) {
+
+            items.push({ "depth": value.depth, "name": value.element.name });
+            result.records[index] = items;
+
+            if (typeof value.children != "undefined") {
+                self.buildLinearArrayFromTree(value.children, result, items, index);
+            } else {
+                /*if(typeof value.metrics !== "undefined") {
+                    _.forEach(value.metrics, function (v, k) {
+                        items.push({mkey:k,mval:v.fv});
+                        result.records[index] = items;
+                    });
+                }*/
+            }
+            index++;
+            items = [];
+        });
+
+        return result;
     },
     "buildSalesReport": function (data) {
         console.log("inside helper buildEventReport");
-        var speechText = "", region = "", category = "";
-        /*region = data[0].element.name;
-        category = data[0].children[0].element.name;
-        speechText = '<speak>Here are the sales report details <break time="200ms"/>';
-        _.forEach(data[0].children[0].children, function (value) {
-            console.log(JSON.stringify(value));
-            speechText += '<s>Region ' + region + '.</s><s>Category ' + category + '.</s><s>Year' + value.element.name + '</s>';//<s>Revenue ' + value.metrics.Revenue.fv + '</s><s>and the units sold is ' + value.metrics['Units Sold'].fv + '. </s>';
-            speechText += '<break time="1s"/>';
-        });
-        speechText += "</speak>";*/
-        var metrics;
-        /*_.forEach(headings, function (value, key) {
-            speechText += '<s>' + value.name + '.</s>';
-            speechText += '<break time="1s"/>';
-        });  */
-        speechText = '<speak>Here are the sales report details <break time="200ms"/>';
+        var speech = new Speech();
+        speech.say("Here are the sales report details").pause("500ms")
         _.forEach(data, function (value, key) {
-            speechText += '<s>Branch Channel ' + value.element.name + '.</s><s>Branch City State ' + value.children[0].element.name + '.</s>';
-            speechText += '<s>Client Full Name ' + value.children[0].children[0].element.name + '.</s>';
-            speechText += '<s>Firm ' + value.children[0].children[0].children[0].element.name + '.</s>';
-            speechText += '<s>Product Group ' + value.children[0].children[0].children[0].children[0].element.name + '.</s>';
-            speechText += '<s>Regional Manager (RM) MF ' + value.children[0].children[0].children[0].children[0].children[0].element.name + '.</s>';
+            speech.sayAs({ word: key + 1, interpret: 'ordinal' });
+            speech.sentence("Branch Channel is " + value.element.name);
+            speech.sentence("Branch City State is " + value.children[0].element.name);
+            speech.sentence("Client Full Name is " + value.children[0].children[0].element.name);
+            speech.sentence("Firm is " + value.children[0].children[0].children[0].element.name);
+            speech.sentence("Product Group is " + value.children[0].children[0].children[0].children[0].element.name);
+            speech.sentence("Regional Manager (RM) MF is " + value.children[0].children[0].children[0].children[0].children[0].element.name);
             metrics = value.children[0].children[0].children[0].children[0].children[0].metrics;
-            speechText += '<s>Branch Rank ' + metrics['Branch Rank'].fv + '</s><s>MF & SMA Current AUM ' + metrics['MF & SMA Current AUM'].fv + '</s>';
-            speechText += '<s>MF & SMA Today Sales' + metrics['MF & SMA Today Sales'].fv + '</s>';
-            speechText += '<s>MF & SMA Pr. Month Sales ' + metrics['MF & SMA Pr. Month Sales'].fv;
-            // + '<s>MF & SMA QTD Reds ' + metrics['MF & SMA QTD Reds'].fv + '</s>';
-            speechText += '<s>RET Current AUM ' + metrics['RET Current AUM'].fv + '</s><s>RET Today Sales ' + metrics['RET Today Sales'].fv + '</s>';
-            speechText += '<break time="1s"/>';
+            speech.sentence("Branch Rank is " + metrics["Branch Rank"].fv);
+            speech.sentence("MF & SMA Current AUM are " + metrics["MF & SMA Current AUM"].fv);
+            speech.sentence("MF & SMA Today Sales are " + metrics["MF & SMA Today Sales"].fv);
+            speech.sentence("MF & SMA Pr. Month Sales are " + metrics["MF & SMA Pr. Month Sales"].fv);
+            speech.sentence("RET Current AUM are " + metrics["RET Current AUM"].fv);
+            speech.sentence("and RET Today Sales are " + metrics["RET Today Sales"].fv).pause("500ms");
         });
-        speechText += "</speak>";
-        return speechText;
+        var speechOutput = speech.ssml();
+        return speechOutput;
     },
     "getSalesInfo": function (rprtId) {
         //EE5687854B3A8B7C9144AA9C0BB2FD75
