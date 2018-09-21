@@ -103,7 +103,7 @@ var self = {
                         if (error) {
                             reject("Event request error", error);
                         }
-                        var salesReport = self.buildSalesReport(body.result.data.root.children);
+                        var salesReport = self.buildSalesReport(body);
                         resolve(salesReport);
                     });
 
@@ -241,12 +241,12 @@ var self = {
             if (typeof value.children != "undefined") {
                 self.buildLinearArrayFromTree(value.children, result, items, index);
             } else {
-                /*if(typeof value.metrics !== "undefined") {
+                if (typeof value.metrics !== "undefined") {
                     _.forEach(value.metrics, function (v, k) {
-                        items.push({mkey:k,mval:v.fv});
+                        items.push({ "depth": k, "name": v.fv });
                         result.records[index] = items;
                     });
-                }*/
+                }
             }
             index++;
             items = [];
@@ -256,23 +256,39 @@ var self = {
     },
     "buildSalesReport": function (data) {
         console.log("inside helper buildEventReport");
+        var result = { "records": [], "columns": [] };
+        _.forEach(data.result.definition.attributes, function (value, key) {
+            result.columns.push(value.name);
+        });
+        _.forEach(data.result.definition.metrics, function (value, key) {
+            result.columns.push(value.name);
+        });
+        result = self.buildLinearArrayFromTree(data.result.data.root.children, result, [], 0);
+        console.log("RES", JSON.stringify(result));
+
         var speech = new Speech();
-        speech.say("Here are the sales report details").pause("500ms")
-        _.forEach(data, function (value, key) {
-            speech.sayAs({ word: key + 1, interpret: 'ordinal' });
-            speech.sentence("Branch Channel is " + value.element.name);
-            speech.sentence("Branch City State is " + value.children[0].element.name);
-            speech.sentence("Client Full Name is " + value.children[0].children[0].element.name);
-            speech.sentence("Firm is " + value.children[0].children[0].children[0].element.name);
-            speech.sentence("Product Group is " + value.children[0].children[0].children[0].children[0].element.name);
-            speech.sentence("Regional Manager (RM) MF is " + value.children[0].children[0].children[0].children[0].children[0].element.name);
-            metrics = value.children[0].children[0].children[0].children[0].children[0].metrics;
-            speech.sentence("Branch Rank is " + metrics["Branch Rank"].fv);
-            speech.sentence("MF & SMA Current AUM are " + metrics["MF & SMA Current AUM"].fv);
-            speech.sentence("MF & SMA Today Sales are " + metrics["MF & SMA Today Sales"].fv);
-            speech.sentence("MF & SMA Pr. Month Sales are " + metrics["MF & SMA Pr. Month Sales"].fv);
-            speech.sentence("RET Current AUM are " + metrics["RET Current AUM"].fv);
-            speech.sentence("and RET Today Sales are " + metrics["RET Today Sales"].fv).pause("500ms");
+        speech.say("Here are the sales report details").pause("500ms");
+        _.forEach(result.records, function (value, key) {
+            if (value.length == result.columns.length) {
+                speech.sayAs({ word: key + 1, interpret: 'ordinal' });
+                for (var j = 0; j < result.columns.length; j++) {
+                    var sentence = "", field = "", dateArray = [];
+                    if (typeof value[j] != "undefined") {
+                        field = value[j].name;
+                        if (field == "") {
+                            sentence = result.columns[j] + " none";
+                            speech.sentence(sentence);
+                        } else {
+                            sentence = result.columns[j] + " " + value[j].name;
+                            speech.sentence(sentence);
+                        }
+                    } else {
+                        sentence = result.columns[j] + " none";
+                        speech.sentence(sentence);
+                    }
+                }
+                speech.pause("500ms");
+            }
         });
         var speechOutput = speech.ssml();
         return speechOutput;
