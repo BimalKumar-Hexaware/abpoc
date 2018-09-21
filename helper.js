@@ -5,6 +5,7 @@ var botConfig = require('./abmspoc-e6fa7-9b84f81aec59.json');
 var requestWithJWT = require('google-oauth-jwt').requestWithJWT();
 var _ = require('lodash');
 var Speech = require('ssml-builder');
+var microstrategyBaseUrl = "http://172.25.209.12:8080";
 
 var self = {
     "queryDialogflow": function (rawQuery) {
@@ -45,7 +46,7 @@ var self = {
                 function (cb) {
                     var options = {
                         method: 'POST',
-                        url: 'http://172.25.142.36:8075/MicroStrategyLibrary/api/auth/login',
+                        url: microstrategyBaseUrl + '/MicroStrategyLibrary/api/auth/login',
                         headers:
                         {
                             accept: 'text/html',
@@ -84,7 +85,7 @@ var self = {
                     var options = {
                         method: 'POST',
                         //url: 'http://172.25.142.36:8075/MicroStrategyLibrary/api/reports/88719C9746FB893117148CACBA0CB92E/instances',
-                        url: 'http://172.25.142.36:8075/MicroStrategyLibrary/api/reports/12DC624040860B5401F516A2341D95C8/instances',
+                        url: microstrategyBaseUrl + '/MicroStrategyLibrary/api/reports/12DC624040860B5401F516A2341D95C8/instances',
                         qs: { limit: '1000' },
                         headers:
                         {
@@ -122,7 +123,7 @@ var self = {
                 function (cb) {
                     var options = {
                         method: 'POST',
-                        url: 'http://172.25.142.36:8075/MicroStrategyLibrary/api/auth/login',
+                        url: microstrategyBaseUrl + '/MicroStrategyLibrary/api/auth/login',
                         headers:
                         {
                             accept: 'text/html',
@@ -159,7 +160,7 @@ var self = {
                     console.log("passed tokrn", mstrAuthToken);
                     var options = {
                         method: 'POST',
-                        url: 'http://172.25.142.36:8075/MicroStrategyLibrary/api/reports/B85A18A944D682077AD280BD71DFE38E/instances',
+                        url: microstrategyBaseUrl + '/MicroStrategyLibrary/api/reports/B85A18A944D682077AD280BD71DFE38E/instances',
                         qs: { limit: '6' },
                         headers:
                         {
@@ -202,7 +203,7 @@ var self = {
         var speech = new Speech();
         speech.say("Here are the event report details").pause("500ms");
         _.forEach(result.records, function (value, key) {
-
+            speech.sayAs({ word: key + 1, interpret: 'ordinal' });
             for (var j = 0; j < result.columns.length; j++) {
                 var sentence = "", field = "", dateArray = [];
                 if (typeof value[j] != "undefined") {
@@ -213,7 +214,7 @@ var self = {
                     } else {
                         if (field.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4}) (\d{1,2}):(\d{1,2}):(\d{1,2}) (?:AM|PM|am|pm)$/)) {
                             dateArray = field.split(" ");
-                            speech.sentence(result.columns[j]);
+                            speech.sentence(result.columns[j] + " ");
                             speech.sayAs({ word: dateArray[0], format: "mdy", interpret: "date" });
                             speech.sayAs({ word: dateArray[1] + dateArray[2], format: "hm12", interpret: "time" });
                         } else {
